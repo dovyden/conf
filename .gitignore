@@ -1,0 +1,15 @@
+# os x
+.DS_Store
+.DS_Store?
+.*DS_Store*
+
+# windows
+Thumbs.db
+
+# idea & vscode
+.idea/
+.vscode/
+
+# node
+node_modules/
+npm-debug.log*
