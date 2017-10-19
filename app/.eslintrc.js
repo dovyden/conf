@@ -6,6 +6,10 @@ module.exports = {
         "jest": true,
         "node": false
     },
+    "globals": {
+        // prevent marking of `process.env` in JSX as error
+        "process": true
+    },
     "parserOptions": {
         "ecmaFeatures": {
             "jsx": true
