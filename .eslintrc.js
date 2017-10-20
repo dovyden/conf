@@ -207,7 +207,7 @@ module.exports = {
             "after": true
         }],
         //   line-comment-position                        // enforce position of line comments
-        "linebreak-style": ["error", "unix"],             // enforce consistent linebreak style
+        "linebreak-style": ["error", "windows"],             // enforce consistent linebreak style
         //   lines-around-comment                         // require empty lines around comments
         //   max-depth                                    // enforce a maximum depth that blocks can be nested
         "max-len": ["error", {                            // enforce a maximum line length
@@ -375,7 +375,7 @@ module.exports = {
         //   react/no-will-update-set-state               // prevent usage of `setState` in `componentWillUpdate`
         //   react/prefer-es6-class                       // enforce ES5 or ES6 class for React Components
         //   react/prefer-stateless-function              // enforce stateless React Components to be written as a pure function
-        // ✓ react/prop-types                             // prevent missing props validation in a React component definition
+        "react/prop-types": [0, {ignore: "ignore"}],         // prevent missing props validation in a React component definition
         // ✓ react/react-in-jsx-scope                     // prevent missing `React` when using JSX
         //   react/require-default-props                  // enforce a defaultProps definition for every prop that is not a required prop
         //   react/require-optimization                   // enforce React components to have a `shouldComponentUpdate` method

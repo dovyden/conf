@@ -8,6 +8,12 @@ import {
     createLogger as logger
 } from 'redux-logger';
 import reducers from '../reducers';
+import throttle from 'lodash/throttle';
+import {loadState, saveState} from './localStorage/';
+import {redirect} from './middlewares/redirect';
+
+// restore state-store from localStorage
+const persistedState = loadState() || {};
 
 // add middlewares to redux store
 const middlewares = [thunk];
@@ -18,11 +24,18 @@ if (process.env.NODE_ENV === 'development') {
         diff: true,
         duration: true
     }));
+    middlewares.push(redirect);
 }
 
 // create store
-export default createStore(
+const store = createStore(
     combineReducers(reducers),
-    {},  // initial store
+    persistedState,  // initial store
     applyMiddleware(...middlewares)
 );
+
+store.subscribe(throttle(() => {
+    saveState(store.getState());
+}, 1000));
+
+export default store;
