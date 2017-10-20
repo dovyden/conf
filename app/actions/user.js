@@ -40,7 +40,7 @@ export const login = (payload) => {
         setTimeout(() => {
             dispatch(successAuth(payload.key));
             saveToLocalStorage('key', payload.key);
-            dispatch(routeTo('/payload', payload.push));
+            dispatch(routeTo('/', payload.push));
         }, 2000);
     };
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import './Auth.css';
 
 export default function AuthForm(props) {
@@ -22,3 +23,7 @@ export default function AuthForm(props) {
         </div>
     );
 }
+
+AuthForm.propTypes = {
+    onClick: PropTypes.func.isRequired
+};

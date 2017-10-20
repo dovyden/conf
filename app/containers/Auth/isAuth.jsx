@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router';
+import {withRouter} from 'react-router-dom';
+import PropTypes from 'prop-types';
 import {ROUTING} from '../../constants/routing';
 
 export default function requireAuthentication(ComponentName) {
@@ -22,7 +23,7 @@ export default function requireAuthentication(ComponentName) {
                     type: ROUTING,
                     payload: {
                         method: push,
-                        nextUrl: '/'
+                        nextUrl: '/auth'
                     }
                 });
             }
@@ -45,6 +46,11 @@ export default function requireAuthentication(ComponentName) {
             user: state.user
         };
     }
+
+    AuthenticatedComponent.propTypes = {
+        user: PropTypes.object,
+        history: PropTypes.object
+    };
 
     return withRouter(connect(mapStateToProps)(AuthenticatedComponent));
 }
