@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {Redirect} from 'react-router';
+import {Redirect} from 'react-router-dom';
+import PropTypes from 'prop-types';
 import {loadFromLocalStorage, saveToLocalStorage} from '../../utils/localStorage';
 import Auth from '../Auth/Auth';
 
@@ -13,9 +14,9 @@ export default class GetToken extends Component {
 
     checkURL() {
         // Get path. Example: site.com/auth/123 -> ['auth','123']
-        const {auth, key} = this.props.match.params;
+        const {key} = this.props.match.params;
 
-        return (auth === 'auth' && key) ? key : false;
+        return (key) ? key : false;
     }
 
     checkLS() {
@@ -35,6 +36,10 @@ export default class GetToken extends Component {
 
         this.checkLS();
 
-        return this.key ? <Redirect to={'/layout'} /> : <Auth fromURL={false}/>;
+        return this.key ? <Redirect to={'/'} /> : <Auth fromURL={false}/>;
     }
 }
+
+GetToken.propTypes = {
+    match: PropTypes.object
+};
