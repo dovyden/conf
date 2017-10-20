@@ -1,17 +1,18 @@
 import React from 'react';
-import logo from './images/logo.svg';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import './App.css';
+import layout from '../Layout/Layout';
+import isAuth from '../../containers/Auth/isAuth';
+import GetToken from '../../containers/App/GetToken';
 
 export default function App() {
     return (
-        <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <h1 className="App-title">Welcome to React</h1>
-            </header>
-            <p className="App-intro">
-                To get started, edit <code>src/components/App/App.js</code> and save to reload.
-            </p>
-        </div>
+        <BrowserRouter>
+            <Switch>
+                {/* Instead RRv3 hooks */}
+                <Route path={'/layout'} component={isAuth(layout)} />
+                <Route exact path={'/:auth?/:key?'} component={GetToken} />
+            </Switch>
+        </BrowserRouter>
     );
 }
