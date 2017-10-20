@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router';
+import {withRouter} from 'react-router-dom';
+import PropTypes from 'prop-types';
 import AuthForm from '../../components/Auth/Auth';
 import Loading from '../../components/Auth/Loading';
 import {saveToLocalStorage} from '../../utils/localStorage/index';
@@ -60,5 +61,13 @@ function mapDispatchToProps(dispatch) {
         actions: bindActionCreators(login, dispatch)
     };
 }
+
+Auth.propTypes = {
+    actions: PropTypes.func.isRequired,
+    history: PropTypes.object,
+    fromURL: PropTypes.bool,
+    loading: PropTypes.bool,
+    token: PropTypes.string,
+};
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Auth));
