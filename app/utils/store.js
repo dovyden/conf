@@ -1,6 +1,5 @@
 import {
     applyMiddleware,
-    combineReducers,
     createStore,
 } from 'redux';
 import thunk from 'redux-thunk';
@@ -22,7 +21,6 @@ if (process.env.NODE_ENV === 'development') {
 
 // create store
 export default createStore(
-    combineReducers(reducers),
-    {},  // initial store
+    reducers,
     applyMiddleware(...middlewares)
 );
