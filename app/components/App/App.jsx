@@ -1,17 +1,26 @@
 import React from 'react';
-import logo from './images/logo.svg';
 import './App.css';
+import {Provider} from 'react-redux';
+import {Route, Switch, BrowserRouter, Redirect} from 'react-router-dom';
+
+import Navigator from '../../containers/Navigator/Navigator';
+import store from '../../utils/store';
 
 export default function App() {
+    const rootNode = '5@test.knevod.com';
     return (
-        <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <h1 className="App-title">Welcome to React</h1>
-            </header>
-            <p className="App-intro">
-                To get started, edit <code>src/components/App/App.js</code> and save to reload.
-            </p>
-        </div>
+        <Provider store={store}>
+            <BrowserRouter>
+                <div>
+                    <Switch>
+                        <Route exact path="/">
+                            <Redirect to={`/nav/${rootNode}`} push/>
+                        </Route>
+                        <Route path="/nav/:nodeId" component={Navigator} />
+                        <Route path="/doc" component={Navigator}/>
+                    </Switch>
+                </div>
+            </BrowserRouter>
+        </Provider>
     );
 }
