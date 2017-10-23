@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Header from '../../containers/Header';
-import ShowDocumentList from '../../containers/ShowDocumentList';
+import DocumentList from '../../containers/DocumentList';
 
 import './css/DynamicReport.css';
 
@@ -9,7 +9,7 @@ class DynamicReport extends Component {
         return (
             <div className="dr">
                 <Header/>
-                <ShowDocumentList/>
+                <DocumentList/>
             </div>
         );
     }
