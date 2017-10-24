@@ -1,7 +1,7 @@
 import {
     AUTH_REQUEST,
     AUTH_SUCCESS
-} from '../constants/user';
+} from '../constants/auth';
 import {
     ROUTING
 } from '../constants/routing';
@@ -40,13 +40,8 @@ export const login = (payload) => {
         setTimeout(() => {
             dispatch(successAuth(payload.key));
             saveToLocalStorage('key', payload.key);
+            saveToLocalStorage('token', payload.token);
             dispatch(routeTo('/', payload.push));
         }, 2000);
-    };
-};
-
-export const logout = () => {
-    return {
-        type: AUTH_SUCCESS
     };
 };

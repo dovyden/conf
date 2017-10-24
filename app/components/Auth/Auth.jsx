@@ -1,29 +1,46 @@
-import React from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+
 import './Auth.css';
 
-export default function AuthForm(props) {
-    const {onClick} = props;
-    let inputKey;
+export default class Auth extends Component {
+    constructor(props) {
+        super(props);
 
-    return (
-        <div className={'Auth'}>
-            <form onSubmit={(e) => {
-                e.preventDefault();
-                if (!inputKey.value || !inputKey.value) {
-                    alert('field can not be empty');
-                    return;
-                }
-                onClick(inputKey.value);
-                inputKey.value = '';
-            }}>
-                <input ref={(input) => (inputKey = input)} placeholder={'Type a Key'}/>
-                <button type={'submit'} >Get Token</button>
+        this.onPressSubmit = this.onPressSubmit.bind(this);
+        this.onInputArea = this.onInputArea.bind(this);
+    }
+
+    onPressSubmit(e) {
+        const {onClick} = this.props;
+
+        e.preventDefault();
+        if (!this.inputKey.value || !this.inputKey.value) {
+            alert('field can not be empty');
+            return;
+        }
+        onClick(this.inputKey.value);
+        this.inputKey.value = '';
+    }
+
+    onInputArea(input) {
+        this.inputKey = input;
+    }
+
+    render() {
+
+        return (
+            <form className="auth-form" onSubmit={this.onPressSubmit}>
+                <input ref={this.onInputArea} placeholder="Type a Key"/>
+                <button type="submit">Get Token</button>
+                {this.props.loading ? <div className="spinner"/> : <div/>}
             </form>
-        </div>
-    );
+
+        );
+    }
 }
 
-AuthForm.propTypes = {
-    onClick: PropTypes.func.isRequired
+Auth.propTypes = {
+    onClick: PropTypes.func.isRequired,
+    loading: PropTypes.bool
 };
