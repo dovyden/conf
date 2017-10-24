@@ -375,7 +375,7 @@ module.exports = {
         //   react/no-will-update-set-state               // prevent usage of `setState` in `componentWillUpdate`
         //   react/prefer-es6-class                       // enforce ES5 or ES6 class for React Components
         //   react/prefer-stateless-function              // enforce stateless React Components to be written as a pure function
-        //   react/prop-types                             // prevent missing props validation in a React component definition
+        // ✓ react/prop-types                             // prevent missing props validation in a React component definition
         // ✓ react/react-in-jsx-scope                     // prevent missing `React` when using JSX
         //   react/require-default-props                  // enforce a defaultProps definition for every prop that is not a required prop
         //   react/require-optimization                   // enforce React components to have a `shouldComponentUpdate` method

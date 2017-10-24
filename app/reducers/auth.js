@@ -2,7 +2,7 @@ import {
     AUTH_REQUEST,
     AUTH_FAIL,
     AUTH_SUCCESS
-} from '../constants/user';
+} from '../constants/auth';
 
 export default function user(state = {}, action) {
     switch (action.type) {

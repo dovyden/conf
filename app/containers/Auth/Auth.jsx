@@ -1,27 +1,34 @@
 import React, {Component} from 'react';
+import {withRouter} from 'react-router-dom';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
 import PropTypes from 'prop-types';
+
+import {login} from '../../actions/auth';
 import AuthForm from '../../components/Auth/Auth';
 import Loading from '../../components/Auth/Loading';
-import {saveToLocalStorage} from '../../utils/localStorage/index';
-import {login} from '../../actions/user';
-
 
 class Auth extends Component {
     constructor(props) {
         super(props);
 
+        this.checkURL = this.checkURL.bind(this);
         this.addToken = this.addToken.bind(this);
     }
 
     componentDidMount() {
-        const {fromURL} = this.props;
+        this.keyFromURL = this.checkURL();
 
-        if (fromURL) {
-            this.addToken(fromURL);
+        if (this.keyFromURL) {
+            this.addToken(this.keyFromURL);
         }
+    }
+
+    checkURL() {
+        // Get path. Example: site.com/auth/123 -> ['auth','123']
+        const {key} = this.props.match.params;
+
+        return (key) ? key : false;
     }
 
     addToken(key) {
@@ -35,24 +42,19 @@ class Auth extends Component {
     }
 
     render() {
-        const {loading, token} = this.props;
+        const {loading} = this.props;
 
-        if (token) {
-            saveToLocalStorage('token', token);
-        }
-
-        if (loading) {
-            return <Loading />;
-        } else {
-            return <AuthForm onClick={this.addToken}/>;
-        }
+        // if (loading) {
+        //     return <Loading />;
+        // } else {
+        return <AuthForm onClick={this.addToken} loading={loading}/>;
+        // }
     }
 }
 
 function mapStateToProps(state) {
     return {
-        loading: state.user.loading,
-        token: state.user.token
+        loading: state.auth.loading
     };
 }
 
@@ -63,11 +65,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 Auth.propTypes = {
+    match: PropTypes.object,
     actions: PropTypes.func.isRequired,
     history: PropTypes.object,
-    fromURL: PropTypes.bool,
-    loading: PropTypes.bool,
     token: PropTypes.string,
+    loading: PropTypes.bool
 };
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Auth));
