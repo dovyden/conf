@@ -5,7 +5,7 @@ export default function Navigator(props) {
     return (
         <div onClick={props.navigateTo()}>
             {props.nodeId}
-            {props.nodeId}
+            {props.scroll}
         </div>
     );
 }
