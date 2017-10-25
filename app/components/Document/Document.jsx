@@ -1,67 +1,70 @@
 import React, {Component} from 'react';
 import * as OpenSeaDragon from 'openseadragon';
-import {Path, Point, paper, PointText} from 'paper';
-
-let path;
-
-let textItem;
+import {Path, paper} from 'paper';
 
 export default class DocumentView extends Component {
     onMouseDown(event) {
-        event.preventDefault();
-        if (path) {
-            path.selected = false;
+        if (!event.ctrlKey) {
+            return;
         }
-        // Create a new path and set its stroke color to black:
-        path = new Path({
-            segments: [event.point],
-            strokeColor: 'yellow',
-            // Select the path, so we can see its segment points:
-            fullySelected: true
+
+        this.flagMouseDown = true;
+
+        const x = event.pageX - this.left;
+        const y = event.pageY - this.top;
+
+        this.path[this.countOfPath] = new Path({
+            segments: [x, y],
+            strokeColor: '#ff0000',
+            strokeWidth: 5,
+
         });
     }
 
     onMouseDrag(event) {
-        console.log(event.persist());
-        path.add(event.point);
-        // Update the content of the text item to show how many
-        // segments it has:
-        textItem.content = `Segment count: ${path.segments.length}`;
+        if (this.flagMouseDown) {
+            if (!event.ctrlKey) {
+                this.onMouseUp();
+            }
+            const x = event.pageX - this.left;
+            const y = event.pageY - this.top;
+            this.path[this.countOfPath].add(x, y);
+        }
     }
 
-    onMouseUp(event) {
-        event.preventDefault();
-
-        const segmentCount = path.segments.length;
-
-        // When the mouse is released, simplify it:
-        path.simplify(10);
-
-        // Select the path, so we can see its segments:
-        path.fullySelected = true;
-
-        const newSegmentCount = path.segments.length;
-        const difference = segmentCount - newSegmentCount;
-        const percentage = 100 - Math.round(newSegmentCount / segmentCount * 100);
-        textItem.content = `${difference} of the ${segmentCount} segments were removed. Saving ${percentage}%`;
+    onMouseUp() {
+        if (this.flagMouseDown) {
+            this.countOfPath++;
+        }
+        this.flagMouseDown = false;
     }
 
     componentDidMount() {
         paper.setup('myCanvas');
-
-        path = new Path();
-
-        textItem = new PointText({
-            content: 'Click and drag to draw a line.',
-            point: new Point(20, 30),
-            fillColor: 'red',
+        const targetElement = document.getElementById('myCanvas');
+        this.left = targetElement.getBoundingClientRect().left;
+        this.top = targetElement.getBoundingClientRect().top;
+        this.countOfPath = 0;
+        this.path = new Array();
+        this.flagMouseDown = false;
+        const viewer = new OpenSeaDragon.Viewer({
+            id: 'noob_way', // дивчик
+            showNavigationControl: false,
+            gestureSettingsMouse: {clickToZoom: false},
+            showNavigator: false,
+            zoomPerScroll: 1.2,
+            minZoomImageRatio: 1,
+            tileSources: 'https://test.knevod.com/static/tile/_test/4H/4H@test.knevod.com/330/0/tiles.dzi'
         });
-
-        // OpenSeaDragon({
-        //     id: 'noob_way',
-        //     prefixUrl: '../../../node_modules/openseadragon/build/openseadragon/images/',
-        //     tileSources: 'https://test.knevod.com/static/tile/_test/4H/4H@test.knevod.com/330/0/tiles.dzi'
-        // });
+        viewer.addHandler('canvas-scroll', (event) =>
+            console.log(viewer.viewport.getZoom(true))
+        );
+        viewer.addHandler("open", function(){
+            const oldBounds = viewer.viewport.getBounds();
+            const newBounds = new OpenSeaDragon.Rect(0, 0.2, 1, oldBounds.height / oldBounds.width);
+            viewer.viewport.fitBounds(newBounds, true); // нужное место на рисунке
+            viewer.viewport.zoomTo(4); // нужный зум
+        });
     }
 
     render() {
@@ -71,8 +74,12 @@ export default class DocumentView extends Component {
                     id="myCanvas"
                     onMouseDown={(event) => this.onMouseDown(event)}
                     onMouseMove={(event) => this.onMouseDrag(event)}
-                    onMouseUp={(event) => this.onMouseUp(event)}/>
+                    onMouseUp={() => this.onMouseUp()}/>
             </div>
         );
     }
 }
+
+
+
+

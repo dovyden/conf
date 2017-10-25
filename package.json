@@ -14,6 +14,7 @@
   "dependencies": {
     "openseadragon": "2.3.1",
     "paper": "0.11.5",
+    "openseadragon-paperjs-overlay": "^0.1.2",
     "react": "16.0.0",
     "react-dom": "16.0.0",
     "react-redux": "5.0.6",
