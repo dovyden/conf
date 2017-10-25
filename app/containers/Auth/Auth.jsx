@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import {login} from '../../actions/auth';
 import AuthForm from '../../components/Auth/Auth';
+import Spinner from '../../components/Spinner/Spinner';
 //import Loading from '../../components/Auth/Loading';
 
 class Auth extends Component {

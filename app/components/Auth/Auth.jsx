@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 import './Auth.css';
 
+import Spinner from '../Spinner/Spinner';
+
 export default class Auth extends Component {
     constructor(props) {
         super(props);
@@ -33,7 +35,7 @@ export default class Auth extends Component {
             <form className="auth-form" onSubmit={this.onPressSubmit}>
                 <input ref={this.onInputArea} placeholder="Type a Key"/>
                 <button type="submit">Get Token</button>
-                {this.props.loading ? <div className="spinner"/> : <div/>}
+                {this.props.loading ? <Spinner /> : <div />}
             </form>
 
         );

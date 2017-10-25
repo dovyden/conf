@@ -14,6 +14,7 @@ export default function user(state = {}, action) {
 
         case AUTH_SUCCESS:
             return {...state,
+                key: action.payload.key,
                 token: action.payload.token,
                 isAuthenticated: action.payload.isAuthenticated,
                 loading: action.payload.loading
