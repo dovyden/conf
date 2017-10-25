@@ -1,12 +1,10 @@
-import encryptingKey from './encryption';
-
 export const loadFromLocalStorage = () => {
     try {
-        const key = localStorage.getItem('key');
-        if (key === null) {
+        const token = localStorage.getItem('token');
+        if (token === null) {
             return false;
         }
-        return key;
+        return token;
     } catch (err) {
         return undefined;
     }
@@ -14,12 +12,7 @@ export const loadFromLocalStorage = () => {
 
 export const saveToLocalStorage = (type, payload) => {
     try {
-        if (type === 'key') {
-            const encryptKey = encryptingKey(payload);
-            localStorage.setItem('key', encryptKey);
-        } else {                                                    // Token
-            localStorage.setItem('token', payload);
-        }
+        localStorage.setItem(type, payload);
     } catch (err) {
         return undefined;
     }
@@ -29,7 +22,7 @@ export const loadState = () => {
     try {
         const serializedState = localStorage.getItem('state');
         if (serializedState === null) {
-            return undefined;
+            return {};
         }
         return JSON.parse(serializedState);
     } catch (err) {

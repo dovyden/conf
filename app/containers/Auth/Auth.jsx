@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
 import {withRouter} from 'react-router-dom';
-import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
 import {login} from '../../actions/auth';
 import AuthForm from '../../components/Auth/Auth';
-import Loading from '../../components/Auth/Loading';
+//import Loading from '../../components/Auth/Loading';
 
 class Auth extends Component {
     constructor(props) {
@@ -32,10 +31,10 @@ class Auth extends Component {
     }
 
     addToken(key) {
-        const login = this.props.actions;
+        const {auth} = this.props;
         const {push} = this.props.history;
 
-        login({
+        auth({
             key,
             push
         });
@@ -60,13 +59,13 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators(login, dispatch)
+        auth: (key, push) => dispatch(login(key, push))
     };
 }
 
 Auth.propTypes = {
     match: PropTypes.object,
-    actions: PropTypes.func.isRequired,
+    auth: PropTypes.func.isRequired,
     history: PropTypes.object,
     token: PropTypes.string,
     loading: PropTypes.bool

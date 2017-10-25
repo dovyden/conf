@@ -7,5 +7,5 @@ export const redirect = store => next => action => {
         action.payload.method(action.payload.nextUrl);
     }
 
-    return next(action)
+    return next(action);
 };

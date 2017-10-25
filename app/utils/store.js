@@ -12,9 +12,6 @@ import throttle from 'lodash/throttle';
 import {loadState, saveState} from './localStorage/';
 import {redirect} from './middlewares/redirect';
 
-// restore state-store from localStorage
-const persistedState = loadState() || {};
-
 // add middlewares to redux store
 const middlewares = [thunk];
 
@@ -26,6 +23,9 @@ if (process.env.NODE_ENV === 'development') {
     }));
     middlewares.push(redirect);
 }
+
+// restore state-store from localStorage
+const persistedState = loadState();
 
 // create store
 const store = createStore(
