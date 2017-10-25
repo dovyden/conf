@@ -23,7 +23,7 @@ class App extends Component {
             this.props.history.push(`/auth/${keyFromUrl}`);
             return;
         }
-
+        // replace
         this.props.history.push(path);
     }
 
