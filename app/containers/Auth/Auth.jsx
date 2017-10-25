@@ -44,11 +44,11 @@ class Auth extends Component {
     render() {
         const {loading} = this.props;
 
-        // if (loading) {
-        //     return <Loading />;
-        // } else {
-        return <AuthForm onClick={this.addToken} loading={loading}/>;
-        // }
+        if (this.keyFromURL) {
+            return <Spinner />;
+        } else {
+            return <AuthForm onClick={this.addToken} loading={loading}/>;
+        }
     }
 }
 
