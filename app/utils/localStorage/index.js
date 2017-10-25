@@ -1,15 +1,3 @@
-export const loadFromLocalStorage = () => {
-    try {
-        const token = localStorage.getItem('token');
-        if (token === null) {
-            return false;
-        }
-        return token;
-    } catch (err) {
-        return undefined;
-    }
-};
-
 export const saveToLocalStorage = (type, payload) => {
     try {
         localStorage.setItem(type, payload);
@@ -20,20 +8,14 @@ export const saveToLocalStorage = (type, payload) => {
 
 export const loadState = () => {
     try {
-        const serializedState = localStorage.getItem('state');
-        if (serializedState === null) {
-            return {};
-        }
-        return JSON.parse(serializedState);
-    } catch (err) {
-        return undefined;
-    }
-};
-
-export const saveState = (state) => {
-    try {
-        const serializedState = JSON.stringify(state);
-        localStorage.setItem('state', serializedState);
+        const key = localStorage.getItem('key');
+        const token = localStorage.getItem('token');
+        return (key && token) ? {
+            auth: {
+                key,
+                token
+            }
+        } : {};
     } catch (err) {
         return undefined;
     }
