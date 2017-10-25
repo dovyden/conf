@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Route, Switch, withRouter} from 'react-router-dom';
 import PropTypes from 'prop-types';
+import {Route, Switch, withRouter} from 'react-router-dom';
 
-import Auth from '../Auth/Auth';
 import AppComponent from '../../components/App/App';
+import Auth from '../Auth/Auth';
 
 class App extends Component {
     constructor(props) {
@@ -15,23 +15,23 @@ class App extends Component {
 
     componentDidMount() {
         const {token} = this.props;
-        const keyFromUrl = this.getUrlParam();
+        const auth = this.getUrlParam();
 
         const path = token ? '/' : '/auth';
 
-        if (keyFromUrl) {
-            this.props.history.push(`/auth/${keyFromUrl}`);
+        // Example: url = 'test.com/auth/:key?' and doesn't exist token at store -> just render
+        if (auth && !token) {
             return;
         }
-        // replace
-        this.props.history.push(path);
+        // if I have token - redirect to '/', otherwise I haven't token and 'auth' at url
+        this.props.history.replace(path);
     }
 
     getUrlParam() {
         const path = window.location.pathname;
         const params = path.split('/');
 
-        return params[2];
+        return params[1];
     }
 
     render() {
@@ -44,15 +44,15 @@ class App extends Component {
     }
 }
 
+App.propTypes = {
+    history: PropTypes.object,
+    token: PropTypes.string
+};
+
 function mapStateToProps(state) {
     return {
         token: state.auth.token
     };
 }
-
-App.propTypes = {
-    history: PropTypes.object,
-    token: PropTypes.string
-};
 
 export default withRouter(connect(mapStateToProps)(App));

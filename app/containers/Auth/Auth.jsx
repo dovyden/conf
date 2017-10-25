@@ -1,16 +1,16 @@
 import React, {Component} from 'react';
-import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import {withRouter} from 'react-router-dom';
 
-import {login} from '../../actions/auth';
 import AuthForm from '../../components/Auth/Auth';
+import {login} from '../../actions/auth';
 import Spinner from '../../components/Spinner/Spinner';
-//import Loading from '../../components/Auth/Loading';
 
 class Auth extends Component {
     constructor(props) {
         super(props);
+        this.state = {loading: true};
 
         this.checkURL = this.checkURL.bind(this);
         this.addToken = this.addToken.bind(this);
@@ -21,6 +21,8 @@ class Auth extends Component {
 
         if (this.keyFromURL) {
             this.addToken(this.keyFromURL);
+        } else {
+            this.setState({loading: false});
         }
     }
 
@@ -35,6 +37,7 @@ class Auth extends Component {
         const {auth} = this.props;
         const {push} = this.props.history;
 
+        this.setState({loading: true});
         auth({
             key,
             push
@@ -42,7 +45,7 @@ class Auth extends Component {
     }
 
     render() {
-        const {loading} = this.props;
+        const {loading} = this.state;
 
         if (this.keyFromURL) {
             return <Spinner />;
@@ -52,11 +55,13 @@ class Auth extends Component {
     }
 }
 
-function mapStateToProps(state) {
-    return {
-        loading: state.auth.loading
-    };
-}
+Auth.propTypes = {
+    auth: PropTypes.func.isRequired,
+    loading: PropTypes.bool,
+    match: PropTypes.object,
+    history: PropTypes.object,
+    token: PropTypes.string
+};
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -64,12 +69,4 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-Auth.propTypes = {
-    match: PropTypes.object,
-    auth: PropTypes.func.isRequired,
-    history: PropTypes.object,
-    token: PropTypes.string,
-    loading: PropTypes.bool
-};
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Auth));
+export default withRouter(connect(null, mapDispatchToProps)(Auth));
