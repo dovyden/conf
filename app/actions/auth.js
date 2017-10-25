@@ -38,10 +38,10 @@ export const login = (payload) => {
 
         /* Imitate request on backend to get token */
         setTimeout(() => {
-            dispatch(successAuth(payload.key));
-            const token = Math.random();
+            const token = String(Math.random());
             saveToLocalStorage('key', payload.key);
             saveToLocalStorage('token', token);
+            dispatch(successAuth(payload.key, token));
             dispatch(routeTo('/', payload.push));
         }, 2000);
     };
