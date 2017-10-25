@@ -14,11 +14,11 @@ const requestAuth = () => ({
     }
 });
 
-const successAuth = (key) => ({
+const successAuth = (key, token) => ({
     type: AUTH_SUCCESS,
     payload: {
         key,
-        token: Math.random(),
+        token,
         isAuthenticated: true,
         loading: false
     }
@@ -39,8 +39,9 @@ export const login = (payload) => {
         /* Imitate request on backend to get token */
         setTimeout(() => {
             dispatch(successAuth(payload.key));
+            const token = Math.random();
             saveToLocalStorage('key', payload.key);
-            saveToLocalStorage('token', payload.token);
+            saveToLocalStorage('token', token);
             dispatch(routeTo('/', payload.push));
         }, 2000);
     };
