@@ -1,3 +1,6 @@
-export const navigate = (type, id) => {
-    console.log(type, id);
+export const navigateAction = (id) => {
+    return {
+        type: 'NAVIGATE_TO',
+        id
+    };
 }

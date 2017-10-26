@@ -3,34 +3,40 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
 import LayoutComponent from '../../components/Layout/Layout';
-import {navigate} from '../../actions/layout';
+import {navigateAction} from '../../actions/layout';
 
 class Layout extends Component {
     constructor(props) {
         super(props);
-
         this.navigateTo = this.navigateTo.bind(this);
     }
 
-    navigateTo(type, id) {
+    navigateTo(id) {
         const {navigate} = this.props;
 
-        navigate(type, id);
+        navigate(id);
     }
 
     render() {
-        return <LayoutComponent navigate={this.navigateTo} />;
+        return <LayoutComponent navigate={this.navigateTo} nodeId={this.props.id} />;
     }
 }
 
 Layout.propTypes = {
-    navigate: PropTypes.func
+    navigate: PropTypes.func,
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 };
 
-function mapDispatchToProps(dispatch) {
+function mapStateToProps(state) {
     return {
-        navigate: (type, id) => dispatch(navigate(type, id))
+        id: state.layout.id
     };
 }
 
-export default (connect(null, mapDispatchToProps)(Layout));
+function mapDispatchToProps(dispatch) {
+    return {
+        navigate: (id) => dispatch(navigateAction(id))
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Layout);
