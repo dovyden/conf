@@ -23,7 +23,7 @@ class App extends Component {
         if (auth && !token) {
             return;
         }
-        // if I have token - redirect to '/', otherwise I haven't token and 'auth' at url
+        // if I have token - redirect to '/', otherwise I haven't token and 'auth' at url - redirect to '/auth'
         this.props.history.replace(path);
     }
 
