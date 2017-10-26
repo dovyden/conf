@@ -4,8 +4,7 @@ import PropTypes from 'prop-types';
 import {withRouter} from 'react-router-dom';
 
 import AuthForm from '../../components/Auth/Auth';
-import {login} from '../../actions/auth';
-import Spinner from '../../components/Spinner/Spinner';
+import {authentication} from '../../actions/auth';
 
 class Auth extends Component {
     constructor(props) {
@@ -26,6 +25,18 @@ class Auth extends Component {
         }
     }
 
+    componentWillReceiveProps(nextProps) {
+        const {isAuthenticated, error} = nextProps;
+
+        if (error) {
+            this.setState({loading: false});
+        }
+        // if the auth was successful -> redirect to '/' (Layout)
+        if (isAuthenticated) {
+            this.props.history.push('/');
+        }
+    }
+
     checkURL() {
         // Get path. Example: site.com/auth/123 -> ['auth','123']
         const {key} = this.props.match.params;
@@ -35,23 +46,20 @@ class Auth extends Component {
 
     addToken(key) {
         const {auth} = this.props;
-        const {push} = this.props.history;
 
         this.setState({loading: true});
-        auth({
-            key,
-            push
-        });
+        auth(key);
     }
 
     render() {
         const {loading} = this.state;
 
-        if (this.keyFromURL) {
-            return <Spinner />;
-        } else {
-            return <AuthForm onClick={this.addToken} loading={loading}/>;
-        }
+        return <AuthForm
+            onClick={this.addToken}
+            loading={loading}
+            message={this.props.message}
+            fromURL={this.keyFromURL}
+        />;
     }
 }
 
@@ -59,14 +67,25 @@ Auth.propTypes = {
     auth: PropTypes.func.isRequired,
     loading: PropTypes.bool,
     match: PropTypes.object,
+    message: PropTypes.string,
     history: PropTypes.object,
-    token: PropTypes.string
+    isAuthenticated: PropTypes.bool,
+    token: PropTypes.string,
+    error: PropTypes.number
 };
 
-function mapDispatchToProps(dispatch) {
+function mapStateToProps(state) {
     return {
-        auth: (key, push) => dispatch(login(key, push))
+        error: state.auth.error,
+        message: state.auth.message,
+        isAuthenticated: state.auth.isAuthenticated
     };
 }
 
-export default withRouter(connect(null, mapDispatchToProps)(Auth));
+function mapDispatchToProps(dispatch) {
+    return {
+        auth: (key) => dispatch(authentication(key))
+    };
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Auth));

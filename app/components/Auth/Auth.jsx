@@ -30,19 +30,28 @@ export default class Auth extends Component {
     }
 
     render() {
+        const loading = this.props.loading ? <Spinner /> : <div />;
+
+        const authArea = this.props.fromURL ? <div />
+            : <div>
+                <input ref={this.onInputArea} placeholder="Type a Key"/>
+                <button type="submit">Get Token</button>
+            </div>;
 
         return (
             <form className="auth-form" onSubmit={this.onPressSubmit}>
-                <input ref={this.onInputArea} placeholder="Type a Key"/>
-                <button type="submit">Get Token</button>
-                {this.props.loading ? <Spinner /> : <div />}
+                <div>{this.props.message}</div>
+                {authArea}
+                {loading}
             </form>
-
         );
+
     }
 }
 
 Auth.propTypes = {
+    loading: PropTypes.bool,
+    message: PropTypes.string,
+    fromURL: PropTypes.any,
     onClick: PropTypes.func.isRequired,
-    loading: PropTypes.bool
 };

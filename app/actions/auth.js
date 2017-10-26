@@ -1,18 +1,10 @@
 import {
-    AUTH_REQUEST,
-    AUTH_SUCCESS
+    AUTH_SUCCESS,
+    AUTH_FAIL
 } from '../constants/auth';
-import {
-    ROUTING
-} from '../constants/routing';
-import {saveToLocalStorage} from '../utils/localStorage/';
 
-const requestAuth = () => ({
-    type: AUTH_REQUEST,
-    payload: {
-        loading: true
-    }
-});
+import fetch from '../utils/fetch';
+import {saveToLocalStorage} from '../utils/localStorage/';
 
 const successAuth = (key, token) => ({
     type: AUTH_SUCCESS,
@@ -20,29 +12,36 @@ const successAuth = (key, token) => ({
         key,
         token,
         isAuthenticated: true,
-        loading: false
     }
 });
 
-const routeTo = (url, push) => ({
-    type: ROUTING,
+const failAuth = ({error, message}) => ({
+    type: AUTH_FAIL,
     payload: {
-        method: push,
-        nextUrl: url
+        error,
+        message,
+        isAuthenticated: false,
     }
 });
 
-export const login = (payload) => {
+export const authentication = (key) => {
     return (dispatch) => {
-        dispatch(requestAuth());
+        fetch('/user/AUTH', {body: {
+            key,
+            api: 100
+        }}).then(res => {
+            return res.json();
+        }).then(json => {
 
-        /* Imitate request on backend to get token */
-        setTimeout(() => {
-            const token = String(Math.random());
-            saveToLocalStorage('key', payload.key);
-            saveToLocalStorage('token', token);
-            dispatch(successAuth(payload.key, token));
-            dispatch(routeTo('/', payload.push));
-        }, 2000);
+            if (json.error) {
+                dispatch(failAuth(json));
+            } else {
+                dispatch(successAuth(key, json.token));
+
+                // what should I do with json.login?
+                saveToLocalStorage('key', key);
+                saveToLocalStorage('token', json.token);
+            }
+        });
     };
 };
