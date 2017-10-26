@@ -11,7 +11,7 @@ export default function Navigator(props) {
 }
 
 Navigator.propTypes = {
-    nodeId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    nodeId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     navigateTo: PropTypes.func.isRequired,
     scroll: PropTypes.number
 };
