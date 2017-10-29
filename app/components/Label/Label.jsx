@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 export default function Label({className, onClick, text}) {
@@ -7,3 +8,9 @@ export default function Label({className, onClick, text}) {
         </label>
     );
 }
+
+Label.propTypes = {
+    className: PropTypes.string.isRequired,
+    onClick: PropTypes.func,
+    text: PropTypes.string.isRequired
+};

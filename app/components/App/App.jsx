@@ -17,12 +17,13 @@ export default function App() {
                 <ConferenceEditor
                     participators={[
                         {
-                            firstName: "Бурков",
+                            firstName: 'Бурков',
                             moderator: false
                         }, {
-                            firstName: "Довыденко",
+                            firstName: 'Довыденко',
                             moderator: true
-                        }]}
+                        }
+                    ]}
                     type="editor" />
             </p>
         </div>

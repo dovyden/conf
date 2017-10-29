@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import Button from '../Button/Button';
@@ -40,22 +41,22 @@ export default function ConferenceEditor({participators, type}) {
             <div>
                 {
                     type === 'creator'
-                    ? <Button
-                        className="conference-editor__create"
-                        text="Создать совещание"
-                        onClick={''} />
-                    : [
-                        <Button
-                            className="conference-editor__save"
-                            key="save"
-                            onClick={''}
-                            text="Сохранить" />,
-                        <Button
-                            className="conference-editor__cancel"
-                            key="cancel"
-                            onClick={''}
-                            text="Отмена" />
-                    ]
+                        ? <Button
+                            className="conference-editor__create"
+                            text="Создать совещание"
+                            onClick={''} />
+                        : [
+                            <Button
+                                className="conference-editor__save"
+                                key="save"
+                                onClick={''}
+                                text="Сохранить" />,
+                            <Button
+                                className="conference-editor__cancel"
+                                key="cancel"
+                                onClick={''}
+                                text="Отмена" />
+                        ]
                 }
                 <Label
                     className="conference-editor__changemoderator"
@@ -65,3 +66,8 @@ export default function ConferenceEditor({participators, type}) {
         </form>
     );
 }
+
+ConferenceEditor.propTypes = {
+    participators: PropTypes.array.isRequired,
+    type: PropTypes.string.isRequired
+};

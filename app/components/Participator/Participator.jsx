@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import Button from '../Button/Button';
@@ -10,12 +11,18 @@ export default function Participator({className, firstName, moderator}) {
             {
                 moderator
                     ? <Label
-                        className={className + '__label'}
+                        className={`${className}__label`}
                         text="M" />
                     : <Button
-                        className={className + '__delete'}
+                        className={`${className}__delete`}
                         onClick={''} />
             }
         </div>
     );
 }
+
+Participator.propTypes = {
+    className: PropTypes.string.isRequired,
+    firstName: PropTypes.string.isRequired,
+    moderator: PropTypes.boolean
+};
