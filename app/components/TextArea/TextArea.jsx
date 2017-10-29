@@ -1,10 +1,11 @@
 import React from 'react';
 
-export default function TextArea({className, defaultText}) {
+export default function TextArea({className, defaultText, type}) {
     return (
-        <input 
+        <textarea
             className={className}
-            type="text"
-            placeholder={defaultText} />
+            placeholder={defaultText}
+            rows={type === "chat" ? 3 : 1}>
+        </textarea>
     );
 }

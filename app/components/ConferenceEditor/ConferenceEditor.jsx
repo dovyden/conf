@@ -14,24 +14,23 @@ export default function ConferenceEditor({participators, type}) {
                     text="Дата и время:" />
                 <Button
                     className="conference-editor__datepick"
-                    text="Дата"
-                    type="date"
-                    onClick={} />
+                    onClick={''}
+                    text="Дата" />
                 <Button
                     className="conference-editor__timepick"
-                    text="Время"
-                    type="time"
-                    onClick={} />
+                    onClick={''}
+                    text="Время" />
             </div>
             <div>
                 <TextArea
                     className="conference-editor__textarea"
-                    defaultText="Тема совещания" />
+                    defaultText="Тема совещания"
+                    type="conferenceTheme" />
             </div>
             <div>
                 <Label
                     className="conference-editor__label"
-                    text={`Участники(${participators.length()})`} />
+                    text={`Участники(${participators.length})`} />
             </div>
             <div>
                 <ParticipatorsPick
@@ -39,29 +38,29 @@ export default function ConferenceEditor({participators, type}) {
                     participators={participators} />
             </div>
             <div>
-                {type === 'creator'
+                {
+                    type === 'creator'
                     ? <Button
                         className="conference-editor__create"
                         text="Создать совещание"
-                        type="button"
-                        onClick={} />
-                    : <div>
+                        onClick={''} />
+                    : [
                         <Button
                             className="conference-editor__save"
-                            text="Сохранить"
-                            type="button"
-                            onClick={} />
+                            key="save"
+                            onClick={''}
+                            text="Сохранить" />,
                         <Button
                             className="conference-editor__cancel"
-                            text="Отмена"
-                            type="button"
-                            onClick={} />
-                    </div>}
-                &nbsp;
+                            key="cancel"
+                            onClick={''}
+                            text="Отмена" />
+                    ]
+                }
                 <Label
                     className="conference-editor__changemoderator"
-                    text="Назначить модератора"
-                    onClick={} />
+                    onClick={''}
+                    text="Назначить модератора" />
             </div>
         </form>
     );

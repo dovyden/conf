@@ -2,6 +2,7 @@ import React from 'react';
 
 import Button from '../Button/Button';
 import Participator from '../Participator/Participator';
+import TextArea from '../TextArea/TextArea';
 
 export default function ParticipatorsPick({className, participators}) {
     return (
@@ -14,7 +15,12 @@ export default function ParticipatorsPick({className, participators}) {
                         moderator={part.moderator} />
                 );
             })}
-
+            <TextArea
+                className={className + '__new-participator'} />
+            <Button
+               className={className + '_add-new-participator'}
+               onClick={''}
+               text="+" />
         </div>
     );
 }

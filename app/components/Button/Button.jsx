@@ -1,13 +1,13 @@
 import React from 'react';
 
-export default function Button({className, onClick, text, type, src}) {
+export default function Button({className, onClick, text, src}) {
     return (
-        <input
-            type={type}
+        <button
             className={'button ' + className}
-            value={text}
-            src={src}
-            onClick={onClick} />
+            onClick={onClick}>
+            <img src={src} alt="" />
+            {text}
+        </button>
     );
 }
 

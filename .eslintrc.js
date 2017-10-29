@@ -4,6 +4,9 @@ module.exports = {
         "es6": true,
         "node": true
     },
+    "ecmaFeatures": {
+        "jsx": true
+    },
     "extends": [
         "eslint:recommended",
         "plugin:jest/recommended",
