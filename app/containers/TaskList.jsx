@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import Task from './Task';
 
 class TaskList extends Component {
     render() {
@@ -10,9 +11,7 @@ class TaskList extends Component {
                     <div
                         key={tasks.id}
                     >
-                        <div>
-                            {tasks.text}
-                        </div>
+                        <Task/>
                     </div>
                 ))}
             </div>

@@ -1,5 +1,5 @@
 .dynamicReport {
-    width: 415px;
+    width: 420px;
     height: 580px;
     border-radius: 3px;
     background-color: #ffffff;
@@ -9,6 +9,11 @@
 .dr-header {
     height: 64px;
     background-color: #6c8da7;
+}
+
+.dr-content {
+    height: 516px;
+    overflow: auto;
 }
 
 .dr-tab {
@@ -49,4 +54,84 @@
 .dr-versionList {
     margin-top: 8px;
     margin-bottom: 8px;
+}
+
+.c-dr-task {
+    width: 100%;
+    height: 240px;
+}
+
+.l-dr-task__content-left {
+    float: left;
+    width: 95px;
+    height: 100%;
+}
+
+.l-dr-task__content-right {
+    float: left;
+    width: 325px;
+    height: 100%;
+}
+
+.c-dr-task__preview {
+    width: 75px;
+    height: 75px;
+    border: solid 1px #d9d9d9;
+    color: #eeeeed;
+}
+
+.l-dr-task__preview {
+    margin: 0 auto;
+}
+
+.c-dr-task__header {
+    height: 42px;
+    font-family: Arial;
+    font-size: 12px;
+    line-height: 1.75;
+    text-align: left;
+    color: #898989;
+}
+
+.c-dr-task__header-status {
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1.62;
+    color: #000000;
+}
+
+.c-dr-task__header-author {
+    font-size: 13px;
+    line-height: 1.62;
+    color: #000000;
+}
+
+.c-dr-task__header-version {
+    float: right;
+    margin-right: 10px;
+}
+
+.l-dr-task__about {
+    margin-top: 15px;
+    width: 400px;
+}
+
+.c-dr-task__text {
+    height: 72px;
+    font-family: Helvetica;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: justify;
+}
+
+.c-dr-task__created {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    width: 310px;
+    height: 20px;
+    font-family: Arial;
+    font-size: 11px;
+    font-style: italic;
+    color: #9b9b9b;
+    text-align: justify;
 }

@@ -7,7 +7,7 @@ import VersionList from './VersionList';
 class DocumentList extends Component {
     render() {
         return (
-            <div>
+            <div className="dr-content">
                 {this.props.documents.map(document => (
                     <div
                         key={document.id}
