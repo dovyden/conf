@@ -7,10 +7,10 @@ class TaskList extends Component {
         return (
             <div className="dr-versionList">
                 {this.props.tasks.map(tasks => (
-                    <div>
-                        <div
-                            key={tasks.id}
-                        >
+                    <div
+                        key={tasks.id}
+                    >
+                        <div>
                             {tasks.text}
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-import * as types from '../constants/ActionTypes';
+import {CHANGE_TAB_DOCUMENT, CHANGE_TAB_VERSION} from '../constants/ActionTypes';
 
 const initialState = {
     documents: {}
@@ -7,7 +7,7 @@ const initialState = {
 const activeTab = (state = initialState, action) => {
     const newState = Object.assign({}, state);
     switch (action.type) {
-        case types.CHANGE_TAB_DOCUMENT:
+        case CHANGE_TAB_DOCUMENT:
             if (newState.documents[action.payload.id]) {
                 delete newState.documents[action.payload.id];
             } else {
@@ -17,7 +17,7 @@ const activeTab = (state = initialState, action) => {
             }
             return newState;
 
-        case types.CHANGE_TAB_VERSION:
+        case CHANGE_TAB_VERSION:
             if (newState.documents[action.payload.idDocument].versions[action.payload.idVersion]) {
                 delete newState.documents[action.payload.idDocument].versions[action.payload.idVersion];
             } else {

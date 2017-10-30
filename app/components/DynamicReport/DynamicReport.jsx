@@ -7,7 +7,7 @@ import './css/DynamicReport.css';
 class DynamicReport extends Component {
     render() {
         return (
-            <div className="dr">
+            <div className="dynamicReport">
                 <Header/>
                 <DocumentList/>
             </div>

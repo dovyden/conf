@@ -9,10 +9,11 @@ class VersionList extends Component {
         return (
             <div className="dr-versionList">
                 {this.props.versions.map(version => (
-                    <div>
+                    <div
+                        key={version.id}
+                    >
                         <div
                             className={this.props.activeTab.documents[this.props.document].versions[version.id] ? 'dr-tab dr-tab-active' : 'dr-tab dr-tab-notActive'}
-                            key={version.id}
                             onClick={() => this.props.onChangeTab({
                                 idDocument: this.props.document,
                                 idVersion: version.id

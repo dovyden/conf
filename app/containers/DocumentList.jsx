@@ -9,10 +9,11 @@ class DocumentList extends Component {
         return (
             <div>
                 {this.props.documents.map(document => (
-                    <div>
+                    <div
+                        key={document.id}
+                    >
                         <div
                             className={this.props.activeTab.documents[document.id] ? 'dr-tab dr-tab-active' : 'dr-tab dr-tab-notActive'}
-                            key={document.id}
                             onClick={() => this.props.onChangeTab(document.id)}
                         >
                             <div className="dr-tab-icon">

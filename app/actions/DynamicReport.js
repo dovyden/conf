@@ -1,8 +1,8 @@
-import * as types from '../constants/ActionTypes';
+import {CHANGE_TAB_DOCUMENT, CHANGE_TAB_VERSION} from '../constants/ActionTypes';
 
 export const changeTabDocument = (id) => {
     return {
-        type: types.CHANGE_TAB_DOCUMENT,
+        type: CHANGE_TAB_DOCUMENT,
         payload: {
             id
         }
@@ -11,7 +11,7 @@ export const changeTabDocument = (id) => {
 
 export const changeTabVersion = (payload) => {
     return {
-        type: types.CHANGE_TAB_VERSION,
+        type: CHANGE_TAB_VERSION,
         payload
     };
 };
