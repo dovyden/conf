@@ -1,9 +1,18 @@
-import React from 'react';
+import React, {Component} from 'react';
+import Header from '../../containers/Header';
+import DocumentList from '../../containers/DocumentList';
 
-export default function DynamicReport() {
-    return (
-        <div className="dynamic-report">
-            DynamicReport
-        </div>
-    );
+import './css/DynamicReport.css';
+
+class DynamicReport extends Component {
+    render() {
+        return (
+            <div className="dynamicReport">
+                <Header/>
+                <DocumentList/>
+            </div>
+        );
+    }
 }
+
+export default DynamicReport;
