@@ -4,43 +4,43 @@ import {
 } from '../constants/auth';
 
 import fetch from '../utils/fetch';
-import {saveToLocalStorage} from '../utils/localStorage/';
+import {saveToLocalStorage} from '../utils/localStorage';
 
-const successAuth = (key, token) => ({
+const successAuth = (key, token, login) => ({
     type: AUTH_SUCCESS,
     payload: {
         key,
         token,
-        isAuthenticated: true,
+        login,
+        isAuthenticated: true
     }
 });
 
-const failAuth = ({error, message}) => ({
+const failAuth = ({error, message}, key) => ({
     type: AUTH_FAIL,
     payload: {
         error,
-        message,
-        isAuthenticated: false,
+        message: `${message}: ${key}`,
+        isAuthenticated: false
     }
 });
 
 export const authentication = (key) => {
     return (dispatch) => {
         fetch('/user/AUTH', {body: {
-            key,
-            api: 100
+            key
         }}).then(res => {
             return res.json();
         }).then(json => {
-
             if (json.error) {
-                dispatch(failAuth(json));
+                dispatch(failAuth(json, key));
             } else {
-                dispatch(successAuth(key, json.token));
+                dispatch(successAuth(key, json.token, json.login));
 
                 // what should I do with json.login?
                 saveToLocalStorage('key', key);
                 saveToLocalStorage('token', json.token);
+                saveToLocalStorage('login', json.login);
             }
         });
     };

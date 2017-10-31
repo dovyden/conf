@@ -10,7 +10,7 @@ import {
 import thunk from 'redux-thunk';
 
 import reducers from '../reducers';
-import {loadState} from './localStorage/';
+import {loadState} from './localStorage';
 
 // add middlewares to redux store
 const middlewares = [thunk];
@@ -30,12 +30,10 @@ if (process.env.NODE_ENV === 'development') {
 const persistedState = loadState();
 
 // create store
-const store = createStore(
+export default createStore(
     combineReducers(reducers),
     persistedState,  // initial store
     composeEnhancers(
         applyMiddleware(...middlewares)
     )
 );
-
-export default store;

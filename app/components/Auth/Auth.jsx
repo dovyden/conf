@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 
 import './Auth.css';
 
-import Spinner from '../Spinner/Spinner';
-
 export default class Auth extends Component {
     constructor(props) {
         super(props);
@@ -14,36 +12,32 @@ export default class Auth extends Component {
     }
 
     onPressSubmit(e) {
+        e.preventDefault();
+
         const {onClick} = this.props;
 
-        e.preventDefault();
-        if (!this.inputKey.value || !this.inputKey.value) {
-            alert('field can not be empty');
+        if (!this.inputKey.value) {
+            alert(`Field can't be empty`);
             return;
         }
         onClick(this.inputKey.value);
         this.inputKey.value = '';
     }
 
-    onInputArea(input) {
-        this.inputKey = input;
+    onInputArea(refKey) {
+        this.inputKey = refKey;
     }
 
     render() {
-        const loading = this.props.loading ? <Spinner /> : <div />;
-
-        const authArea = this.props.fromURL ? <div />
-            : <div>
-                <input ref={this.onInputArea} placeholder="Type a Key"/>
-                <button type="submit">Get Token</button>
-            </div>;
-
+        const {loading, message} = this.props;
         return (
-            <form className="auth-form" onSubmit={this.onPressSubmit}>
-                <div>{this.props.message}</div>
-                {authArea}
-                {loading}
-            </form>
+            <div className="auth">
+                <form className="auth-form" onSubmit={this.onPressSubmit}>
+                    {message ? <div className="message">{message}</div> : null}
+                    <input ref={this.onInputArea} placeholder="Type a Key" disabled={loading}/>
+                    <button type="submit">Get Token</button>
+                </form>
+            </div>
         );
 
     }

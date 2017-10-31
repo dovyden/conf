@@ -5,6 +5,7 @@ import {withRouter} from 'react-router-dom';
 
 import AuthForm from '../../components/Auth/Auth';
 import {authentication} from '../../actions/auth';
+import Spinner from '../../components/Spinner/Spinner';
 
 class Auth extends Component {
     constructor(props) {
@@ -53,13 +54,14 @@ class Auth extends Component {
 
     render() {
         const {loading} = this.state;
+        const {fromURL, message} = this.props;
 
-        return <AuthForm
-            onClick={this.addToken}
-            loading={loading}
-            message={this.props.message}
-            fromURL={this.keyFromURL}
-        />;
+        return (
+            <div>
+                {loading ? <Spinner className="center__spinner"/> : null}
+                {fromURL ? null : <AuthForm onClick={this.addToken} loading={loading} message={message} />}
+            </div>
+        );
     }
 }
 
@@ -69,6 +71,7 @@ Auth.propTypes = {
     match: PropTypes.object,
     message: PropTypes.string,
     history: PropTypes.object,
+    fromURL: PropTypes.any,
     isAuthenticated: PropTypes.bool,
     token: PropTypes.string,
     error: PropTypes.number
@@ -76,8 +79,8 @@ Auth.propTypes = {
 
 function mapStateToProps(state) {
     return {
-        error: state.auth.error,
-        message: state.auth.message,
+        error: state.auth.error.code,
+        message: state.auth.error.message,
         isAuthenticated: state.auth.isAuthenticated
     };
 }

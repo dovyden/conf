@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Layout from '../Layout/Layout';
+import Layout from '../../containers/Layout/Layout';
 import Toolbar from '../Toolbar/Toolbar';
 
 export default function App() {
