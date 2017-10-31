@@ -16,14 +16,14 @@ recorder.addEventListener(RecorderEvents.Started, e => {
     Logger.write(`Conference record URL: ${conferenceRecordUrl}`);
 });
 
-recorder.addEventListener(RecorderEvents.Stopped, e  => {
+recorder.addEventListener(RecorderEvents.Stopped, e => {
     conferenceRecordData = {
         conferenceRecordUrl,
         conferenceRecordDuration: e.duration,
         conferenceRecordCost: e.cost
     };
 
-    Net.httpRequest('URL', null, {
+    Net.httpRequest(frontBackURL, null, {
         headers: [
             `X-conference-Id: ${conferenceId}`,
             `X-conference-record`
@@ -34,7 +34,7 @@ recorder.addEventListener(RecorderEvents.Stopped, e  => {
 });
 
 recorder.addEventListener(RecorderEvents.RecorderError, e => {
-    conferenceRecord = {
+    conferenceRecordData = {
         conferenceRecordUrl,
         conferenceRecordErr: e.error
     };
@@ -45,7 +45,7 @@ recorder.addEventListener(RecorderEvents.RecorderError, e => {
             `X-conference-record`
         ],
         method: 'POST',
-        postData: JSON.stringify(conferenceRecord),
+        postData: JSON.stringify(conferenceRecordData),
     });
 });
 
@@ -80,7 +80,7 @@ VoxEngine.addEventListener(AppEvents.Started, () => {
     conferenceId = data.conferenceId;
     frontBackURL = data.frontBackURL;
     Logger.write(`Conference start. ID ${conferenceId}`);
-    checkMoneyOrConnection()
+    checkMoneyOrConnection();
 });
 
 VoxEngine.addEventListener(AppEvents.HttpRequest, e => { //входящий запрос по media_session_access_url
@@ -93,23 +93,24 @@ VoxEngine.addEventListener(AppEvents.HttpRequest, e => { //входящий за
 });
 
 function checkMoneyOrConnection() {
-    Net.httpRequestAsync(frontBackURL,{
+    Net.httpRequestAsync(frontBackURL, {
         headers: [
             `X-conference-Id: ${conferenceId}`,
-            `X-something-check`]
+            `X-something-check`
+        ]
     })
         .then(responce => {
-            let headers = JSON.stringify(responce.headers);
+            const headers = JSON.stringify(responce.headers);
             if (headers.something) {
                 recorder.stop();
                 Logger.write(`Conference stop. ID ${conferenceId}`);
                 VoxEngine.terminate();
             } else {
-                setTimeout(checkMoneyOrConnection, 300000)
+                setTimeout(checkMoneyOrConnection, 300000);
             }
         })
         .catch(error => {
             Logger.write(`Error: ${error}`);
-            setTimeout(checkMoneyOrConnection, 300000)
-        })
+            setTimeout(checkMoneyOrConnection, 300000);
+        });
 }
