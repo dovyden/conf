@@ -5,12 +5,7 @@ import Layout from '../../containers/Layout/Layout';
 export default function App() {
     return (
         <div>
-            <Layout
-                data={{
-                    direction: 'row',
-                    flexBasis: '100%',
-                }}
-            />
+            <Layout/>
         </div>
     );
 }

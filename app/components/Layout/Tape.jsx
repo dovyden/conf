@@ -2,15 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './Layout.css';
 
-const Tape = ({children, direction, size}) => {
+const Tape = ({children, direction, size, type}) => {
     const styleProp = {
-        flexDirection: direction,
         flexBasis: size,
     };
 
+    if (direction) {
+        styleProp.flexDirection = direction;
+    }
+
     if (size !== '0%') {
         return (
-            <div className={'tape'} style={styleProp}>
+            <div className={type} style={styleProp}>
                 {children}
             </div>
         );
@@ -23,6 +26,7 @@ Tape.propTypes = {
     children: PropTypes.node,
     direction: PropTypes.string,
     size: PropTypes.string,
+    type: PropTypes.string,
 };
 
 export default Tape;

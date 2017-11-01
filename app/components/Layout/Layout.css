@@ -9,14 +9,11 @@
 .tape {
     display: flex;
     background: aqua;
-    border: 1px solid black;
 }
 
 .cell {
     background: antiquewhite;
     border: 1px solid black;
-    /*text-align: center;         !*for numbers in cells *!*/
-    /*line-height: 5;             !*for numbers in cells *!*/
 }
 
 .splitter_top {

@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import LayoutComponent from '../../components/Layout/Layout';
 import Tape from '../../components/Layout/Tape';
 import Splitter from '../../components/Layout/Splitter';
-import Cell from '../../components/Layout/Cell'
 
 
 function unFocus(document, window) {
@@ -44,19 +43,15 @@ class Layout extends Component {
     }
 
     componentDidMount() {
-        this.setState({                             //only for tapes version
-            tape: this.props.data.flexBasis,
-            direction: this.props.data.direction,
-        });
-        window.addEventListener('mousemove', this.mouseMoveLine, false);
-        window.addEventListener('mouseup', this.mouseUpLine, false);
+        window.addEventListener('mousemove', this.mouseMoveLine.bind(this), false);
+        window.addEventListener('mouseup', this.mouseUpLine.bind(this), false);
     }
     componentWillUnmount() {
-        window.removeEventListener('mousemove', this.mouseMoveLine, false);
-        window.removeEventListener('mouseup', this.mouseUpLine, false);
+        window.removeEventListener('mousemove', this.mouseMoveLine.bind(this), false);
+        window.removeEventListener('mouseup', this.mouseUpLine.bind(this), false);
     }
 
-    down1 = (e) => {
+    down1(e) {
         switch (e.target.dataset.type) {
             case 'top':
             case 'bottom':
@@ -78,7 +73,7 @@ class Layout extends Component {
                 break;
         }
     }
-    down2 = (e) => {
+    down2(e) {
         switch (e.target.dataset.type) {
             case 'top':
                 this.downTo5();
@@ -100,7 +95,7 @@ class Layout extends Component {
                 break;
         }
     }
-    down3 = (e) => {
+    down3(e) {
         if (e.target.dataset.type === this.state.type) {
             const type = e.target.dataset.type;
             const opposite = (type === 'top') ? 'bottom' :
@@ -125,7 +120,7 @@ class Layout extends Component {
         }
     }
 
-    possibleDownTo2 = (e) => {
+    possibleDownTo2(e) {
         if (e.clientY - parseFloat(this.state.top) *
             e.target.parentElement.clientHeight / 100 < this.state.sizeOfBox){
             return 'top';
@@ -139,7 +134,7 @@ class Layout extends Component {
         }
     }
 
-    downTo2 = (e, type, opposite) => {
+    downTo2(e, type, opposite) {
 
         this.setState({
             ...this.state,
@@ -152,7 +147,7 @@ class Layout extends Component {
             parentWidth: e.target.parentElement.clientWidth,
         });
     }
-    downTo3 = (e, type, opposite) => {
+    downTo3(e, type, opposite) {
         this.setState({
             ...this.state,
             currentState: 3,
@@ -167,7 +162,7 @@ class Layout extends Component {
     downTo4 = (e) => {}
     downTo5 = (e) => {}
 
-    move2 = (e) => {
+    move2(e) {
         switch (this.state.type) {
             case 'left top':
                 this.setState({
@@ -199,7 +194,7 @@ class Layout extends Component {
                 break;
         }
     }
-    move3 = (e) => {
+    move3(e) {
         switch (this.state.type) {
             case 'top':
                 this.setState({
@@ -228,7 +223,7 @@ class Layout extends Component {
         }
     }
 
-    up2 = (e) => {
+    up2(e) {
         if (this.possibleUpTo1(e, 2)) {
             this.upTo1();
         } else {
@@ -300,7 +295,7 @@ class Layout extends Component {
                 }
         }
     }
-    up3 = (e) => {
+    up3(e) {
         if (this.possibleUpTo1(e, 3)) {
             this.upTo1();
         } else {
@@ -325,7 +320,7 @@ class Layout extends Component {
         }
     }
 
-    possibleUpTo1 = (e, previousState) => {
+    possibleUpTo1(e, previousState) {
         switch (previousState) {
             case 2:
                 return (e.clientY < this.state.minSizeOfCell ||
@@ -344,7 +339,7 @@ class Layout extends Component {
         }
     }
 
-    possibleUpTo2 = (e, previousState) => {
+    possibleUpTo2(e, previousState) {
         switch (previousState) {
             case 2:
                 return (e.clientY > this.state.minSizeOfCell &&
@@ -356,7 +351,7 @@ class Layout extends Component {
         }
     }
 
-    upTo1 = () => {
+    upTo1() {
         this.setState({
             ...this.state,
             currentState: 1,
@@ -373,7 +368,7 @@ class Layout extends Component {
             displayNone: '',
         });
     }
-    upTo2 = (type, opposite, size, sizeOfCell) => {
+    upTo2(type, opposite, size, sizeOfCell) {
         this.setState({
             ...this.state,
             currentState: 2,
@@ -386,7 +381,7 @@ class Layout extends Component {
             displayNone: opposite,
         });
     }
-    upTo3 = (type, opposite, size) => {
+    upTo3(type, opposite, size) {
         switch (type) {
             case 'top':
                 this.setState({
@@ -455,7 +450,7 @@ class Layout extends Component {
         }
     }
 
-    mouseDownLine = (e) => {
+    mouseDownLine(e) {
         if (e.target.dataset.type) {
             switch (this.state.currentState) {
                 case 1:
@@ -470,7 +465,7 @@ class Layout extends Component {
             }
         }
     }
-    mouseMoveLine = (e) => {
+    mouseMoveLine(e) {
         if (this.state.isDragging) {
             unFocus(document, window);
             switch (this.state.currentState){
@@ -483,7 +478,7 @@ class Layout extends Component {
             }
         }
     }
-    mouseUpLine = (e) => {
+    mouseUpLine(e) {
         if (this.state.isDragging) {
             switch (this.state.currentState) {
                 case 2:
@@ -500,31 +495,37 @@ class Layout extends Component {
         return (
             <LayoutComponent
                 direction={this.state.direction}
-                mousedown={this.mouseDownLine}
+                mousedown={this.mouseDownLine.bind(this)}
             >
                 <Splitter type={'top'} position={this.state.top} display = {this.state.displayNone}/>
                 <Splitter type={'bottom'} position={this.state.bottom} display = {this.state.displayNone}/>
                 <Splitter type={'left'} position={this.state.left} display = {this.state.displayNone}/>
                 <Splitter type={'right'} position={this.state.right} display = {this.state.displayNone}/>
                 <Tape
+                    type={'tape'}
                     direction={(this.state.direction === 'row') ? 'column' : 'row'}
                     size={this.state.tape}
                 >
-                    <Cell
+                    <Tape
+                        type={'cell'}
                         size={this.state.cellOf1stTape}
                     />
-                    <Cell
+                    <Tape
+                        type={'cell'}
                         size={`${100 - parseFloat(this.state.cellOf1stTape)}%`}
                     />
                 </Tape>
                 <Tape
+                    type={'tape'}
                     direction={(this.state.direction === 'row') ? 'column' : 'row'}
                     size={`${100 - parseFloat(this.state.tape)}%`}
                 >
-                    <Cell
+                    <Tape
+                        type={'cell'}
                         size={this.state.cellOf2ndTape}
                     />
-                    <Cell
+                    <Tape
+                        type={'cell'}
                         size={`${100 - parseFloat(this.state.cellOf2ndTape)}%`}
                     />
                 </Tape>
