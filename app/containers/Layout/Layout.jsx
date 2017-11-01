@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
+import {changeLayout} from '../../actions/layout';
 import LayoutComponent from '../../components/Layout/Layout';
 import Tape from '../../components/Layout/Tape';
 import Splitter from '../../components/Layout/Splitter';
@@ -27,10 +29,10 @@ class Layout extends Component {
             left: '0%',
             right: '100%',
             displayNone: '',                //display: none for splitters
-            tape: '100%',                   //flexBasis for 1st tape
-            cellOf1stTape: '100%',          //flexBasis for 1st cell of 1st tape
-            cellOf2ndTape: '100%',          //flexBasis for 1st cell of 2nd tape
-            direction: 'row',               //for tapes => for cells is opposite
+            //tape: '100%',                   //flexBasis for 1st tape
+            //cellOf1stTape: '100%',          //flexBasis for 1st cell of 1st tape
+            //cellOf2ndTape: '100%',          //flexBasis for 1st cell of 2nd tape
+            //direction: 'row',               //for tapes => for cells is opposite
 
             type: '',                       //type of dragging
             isDragging: false,              //state of dragging
@@ -352,95 +354,110 @@ class Layout extends Component {
     }
 
     upTo1() {
+        const {changeLayout} = this.props;
+
         this.setState({
             ...this.state,
             currentState: 1,
             isDragging: false,
             type: '',
-            direction: 'row',
-            tape: '100%',
-            cellOf1stTape: '100%',
-            cellOf2ndTape: '100%',
             top: '0%',
             bottom: '100%',
             left: '0%',
             right: '100%',
             displayNone: '',
         });
+
+        changeLayout({
+            stateId: 1,
+            direction: 'row',
+            tape: '100%',
+            cellOf1stTape: '100%',
+            cellOf2ndTape: '100%',
+        });
     }
+
     upTo2(type, opposite, size, sizeOfCell) {
+        const {changeLayout} = this.props;
+
         this.setState({
             ...this.state,
             currentState: 2,
             isDragging: false,
             type: type,
+            displayNone: opposite,
+        });
+
+        changeLayout({
+            stateId: 2,
             direction: 'row',
             tape: size,
             cellOf1stTape: sizeOfCell,
             cellOf2ndTape: sizeOfCell,
-            displayNone: opposite,
         });
     }
     upTo3(type, opposite, size) {
+        const {changeLayout} = this.props;
+
+        const direction = type === ('top' || 'bottom')
+            ? 'column'
+            : 'row';
+
+        changeLayout({
+            stateId: 3,
+            direction,
+            tape: size,
+            cellOf1stTape: '100%',
+            cellOf2ndTape: '100%',
+        });
+
         switch (type) {
+
             case 'top':
                 this.setState({
                     ...this.state,
                     currentState: 3,
                     isDragging: false,
                     type: type,
-                    direction: 'column',
-                    tape: size,
-                    cellOf1stTape: '100%',
-                    cellOf2ndTape: '100%',
                     bottom: '100%',
                     left: '0%',
                     right: '100%',
                     displayNone: opposite,
                 });
                 break;
+
             case 'bottom':
                 this.setState({
                     ...this.state,
                     currentState: 3,
                     isDragging: false,
                     type: type,
-                    direction: 'column',
-                    tape: size,
-                    cellOf1stTape: '100%',
-                    cellOf2ndTape: '100%',
                     top: '0%',
                     left: '0%',
                     right: '100%',
                     displayNone: opposite,
                 });
                 break;
+
             case 'left':
                 this.setState({
                     ...this.state,
                     currentState: 3,
                     isDragging: false,
                     type: type,
-                    direction: 'row',
-                    tape: size,
-                    cellOf1stTape: '100%',
-                    cellOf2ndTape: '100%',
                     top: '0%',
                     bottom: '100%',
                     right: '100%',
                     displayNone: opposite,
                 });
                 break;
+
             case 'right':
                 this.setState({
                     ...this.state,
                     currentState: 3,
                     isDragging: false,
                     type: type,
-                    direction: 'row',
-                    tape: size,
-                    cellOf1stTape: '100%',
-                    cellOf2ndTape: '100%',
                     top: '0%',
                     bottom: '100%',
                     left: '0%',
@@ -494,7 +511,7 @@ class Layout extends Component {
     render() {
         return (
             <LayoutComponent
-                direction={this.state.direction}
+                direction={this.props.layout.direction}
                 mousedown={this.mouseDownLine.bind(this)}
             >
                 <Splitter type={'top'} position={this.state.top} display = {this.state.displayNone}/>
@@ -503,30 +520,30 @@ class Layout extends Component {
                 <Splitter type={'right'} position={this.state.right} display = {this.state.displayNone}/>
                 <Tape
                     type={'tape'}
-                    direction={(this.state.direction === 'row') ? 'column' : 'row'}
+                    direction={(this.props.layout.direction === 'row') ? 'column' : 'row'}
                     size={this.state.tape}
                 >
                     <Tape
                         type={'cell'}
-                        size={this.state.cellOf1stTape}
+                        size={this.props.layout.cellOf1stTape}
                     />
                     <Tape
                         type={'cell'}
-                        size={`${100 - parseFloat(this.state.cellOf1stTape)}%`}
+                        size={`${100 - parseFloat(this.props.layout.cellOf1stTape)}%`}
                     />
                 </Tape>
                 <Tape
                     type={'tape'}
-                    direction={(this.state.direction === 'row') ? 'column' : 'row'}
+                    direction={(this.props.layout.direction === 'row') ? 'column' : 'row'}
                     size={`${100 - parseFloat(this.state.tape)}%`}
                 >
                     <Tape
                         type={'cell'}
-                        size={this.state.cellOf2ndTape}
+                        size={this.props.layout.cellOf2ndTape}
                     />
                     <Tape
                         type={'cell'}
-                        size={`${100 - parseFloat(this.state.cellOf2ndTape)}%`}
+                        size={`${100 - parseFloat(this.props.layout.cellOf2ndTape)}%`}
                     />
                 </Tape>
             </LayoutComponent>
@@ -538,4 +555,16 @@ Layout.propTypes = {
     data: PropTypes.object,
 };
 
-export default Layout;
+function mapStateToProps(state) {
+    return {
+        layout: state.layout
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        changeLayout: (props) => dispatch(changeLayout(props))
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Layout);
