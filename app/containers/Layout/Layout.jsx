@@ -23,23 +23,19 @@ class Layout extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentState: 1,
+            currentState: this.props.layout.stateId,
             top: '0%',                      //4 splitters
             bottom: '100%',
             left: '0%',
             right: '100%',
-            displayNone: '',                //display: none for splitters
-            //tape: '100%',                   //flexBasis for 1st tape
-            //cellOf1stTape: '100%',          //flexBasis for 1st cell of 1st tape
-            //cellOf2ndTape: '100%',          //flexBasis for 1st cell of 2nd tape
-            //direction: 'row',               //for tapes => for cells is opposite
+            displayNone: '',                //display: none for splitters   change on hiddenSplitters
 
-            type: '',                       //type of dragging
+            type: '',                       //type of dragging              change on draggingSplitters
             isDragging: false,              //state of dragging
-            parentWidth: 0,                 //of cell or tape
+            parentWidth: 0,                 //of tape
             parentHeight: 0,                //depend on size of splitter
 
-            minSizeOfCell: 50,              //for creating and deleting
+            minSizeOfCell: 50,              //for creating and deleting     change on minSizeOfTape
             sizeOfBox: 20,                  //for dragging intersection point
         };
     }
@@ -57,20 +53,17 @@ class Layout extends Component {
         switch (e.target.dataset.type) {
             case 'top':
             case 'bottom':
-                const type = e.target.dataset.type;
-                const opposite = (type === 'top') ? 'bottom' : 'top';
-                this.downTo3(e, type, opposite);
+                this.downTo3(e, e.target.dataset.type);
                 break;
+
             case 'left':
             case 'right':
                 const type1 = e.target.dataset.type;
-                const opposite1 = (type1 === 'left') ? 'right' : 'left';
                 const type2 = this.possibleDownTo2(e);
                 if (type2) {
-                    const opposite2 = (type2 === 'top') ? 'bottom' : 'top';
-                    this.downTo2(e, `${type1} ${type2}`, `${opposite1} ${opposite2}`);
+                    this.downTo2(e, `${type1} ${type2}`);
                 } else {
-                    this.downTo3(e, type1, opposite1);
+                    this.downTo3(e, type1);
                 }
                 break;
         }
@@ -80,17 +73,17 @@ class Layout extends Component {
             case 'top':
                 this.downTo5();
                 break;
+
             case 'bottom':
                 this.downTo5();
                 break;
+
             case 'left':
             case 'right':
                 const type1 = e.target.dataset.type;
-                const opposite1 = (type1 === 'left') ? 'right' : 'left';
                 const type2 = this.possibleDownTo2(e);
                 if (type2) {
-                    const opposite2 = (type2 === 'top') ? 'bottom' : 'top';
-                    this.downTo2(e, `${type1} ${type2}`, `${opposite1} ${opposite2}`);
+                    this.downTo2(e, `${type1} ${type2}`);
                 } else {
                     this.downTo5();
                 }
@@ -99,44 +92,25 @@ class Layout extends Component {
     }
     down3(e) {
         if (e.target.dataset.type === this.state.type) {
-            const type = e.target.dataset.type;
-            const opposite = (type === 'top') ? 'bottom' :
-                (type === 'bottom') ? 'top' :
-                    (type === 'left') ? 'right' : 'left';
-            this.downTo3(e, type, opposite);
+            this.downTo3(e, e.target.dataset.type);
         } else {
-            switch (e.target.dataset.type) {
-                case 'top':
-                    this.downTo4();
-                    break;
-                case 'bottom':
-                    this.downTo4();
-                    break;
-                case 'left':
-                    this.downTo4();
-                    break;
-                case 'right':
-                    this.downTo4();
-                    break;
-            }
+            this.downTo4();         // e.target.dataset.type: top, bottom, ...
         }
     }
 
     possibleDownTo2(e) {
-        if (e.clientY - parseFloat(this.state.top) *
-            e.target.parentElement.clientHeight / 100 < this.state.sizeOfBox){
-            return 'top';
-        } else {
-            if (parseFloat(this.state.bottom) * e.target.parentElement.clientHeight / 100
-                - e.clientY < this.state.sizeOfBox) {
-                return 'bottom';
-            } else {
-                return false;
-            }
-        }
+        return (e.clientY - parseFloat(this.state.top) *
+                e.target.parentElement.clientHeight / 100 <
+                this.state.sizeOfBox) ? 'top' :
+                    (parseFloat(this.state.bottom) *
+                    e.target.parentElement.clientHeight / 100 - e.clientY <
+                    this.state.sizeOfBox) ? 'bottom' : '';
     }
 
-    downTo2(e, type, opposite) {
+    downTo2(e, type) {
+        const opposite = (type === 'left top') ? 'right bottom' :
+            (type === 'right bottom') ? 'left top' :
+            (type === 'left bottom') ? 'right top' : 'left bottom';
 
         this.setState({
             ...this.state,
@@ -149,7 +123,11 @@ class Layout extends Component {
             parentWidth: e.target.parentElement.clientWidth,
         });
     }
-    downTo3(e, type, opposite) {
+    downTo3(e, type) {
+        const opposite = (type === 'top') ? 'bottom' :
+            (type === 'bottom') ? 'top' :
+            (type === 'left') ? 'right' : 'left';
+
         this.setState({
             ...this.state,
             currentState: 3,
@@ -165,182 +143,84 @@ class Layout extends Component {
     downTo5 = (e) => {}
 
     move2(e) {
-        switch (this.state.type) {
-            case 'left top':
-                this.setState({
-                    ...this.state,
-                    left: `${e.clientX / this.state.parentWidth * 100}%`,
-                    top: `${e.clientY / this.state.parentHeight * 100}%`,
-                });
-                break;
-            case 'left bottom':
-                this.setState({
-                    ...this.state,
-                    left: `${e.clientX / this.state.parentWidth * 100}%`,
-                    bottom: `${e.clientY / this.state.parentHeight * 100}%`,
-                });
-                break;
-            case 'right top':
-                this.setState({
-                    ...this.state,
-                    right: `${e.clientX / this.state.parentWidth * 100}%`,
-                    top: `${e.clientY / this.state.parentHeight * 100}%`,
-                });
-                break;
-            case 'right bottom':
-                this.setState({
-                    ...this.state,
-                    right: `${e.clientX / this.state.parentWidth * 100}%`,
-                    bottom: `${e.clientY / this.state.parentHeight * 100}%`,
-                });
-                break;
-        }
+        const arr = this.state.type.split(' ');
+
+        this.setState({
+            ...this.state,
+            [arr[0]]: `${e.clientX / this.state.parentWidth * 100}%`,
+            [arr[1]]: `${e.clientY / this.state.parentHeight * 100}%`,
+        });
     }
     move3(e) {
-        switch (this.state.type) {
-            case 'top':
-                this.setState({
-                    ...this.state,
-                    top: `${e.clientY / this.state.parentHeight * 100}%`,
-                });
-                break;
-            case 'bottom':
-                this.setState({
-                    ...this.state,
-                    bottom: `${e.clientY / this.state.parentHeight * 100}%`,
-                });
-                break;
-            case 'left':
-                this.setState({
-                    ...this.state,
-                    left: `${e.clientX / this.state.parentWidth * 100}%`,
-                });
-                break;
-            case 'right':
-                this.setState({
-                    ...this.state,
-                    right: `${e.clientX / this.state.parentWidth * 100}%`,
-                });
-                break;
-        }
+        const position = (this.state.type === ('top' || 'bottom')) ?
+            `${e.clientY / this.state.parentHeight * 100}%` :
+            `${e.clientX / this.state.parentWidth * 100}%`;
+
+        this.setState({
+            ...this.state,
+            [this.state.type]: position,
+        });
     }
 
     up2(e) {
         if (this.possibleUpTo1(e, 2)) {
             this.upTo1();
         } else {
-                switch (this.state.type) {
-                    case 'left top':
-                        if (this.possibleUpTo2(e, 2)) {
-                            this.upTo2('left top', 'right bottom',
-                                this.state.left, this.state.top);
-                        } else {
-                            if (e.clientY < this.state.minSizeOfCell ||
-                                e.clientY > this.state.parentHeight -
-                                            this.state.minSizeOfCell) {
-                                this.upTo3('left', 'right',
-                                    `${e.clientX / this.state.parentWidth * 100}%`);
-                            } else {
-                                this.upTo3('top', 'bottom',
-                                    `${e.clientY / this.state.parentHeight * 100}%`);
-                            }
-                        }
-                        break;
-                    case 'left bottom':
-                        if (this.possibleUpTo2(e, 2)) {
-                            this.upTo2('left bottom', 'right top',
-                                this.state.left, this.state.bottom);
-                        } else {
-                            if (e.clientY < this.state.minSizeOfCell ||
-                                e.clientY > this.state.parentHeight -
-                                this.state.minSizeOfCell) {
-                                this.upTo3('left', 'right',
-                                    `${e.clientX / this.state.parentWidth * 100}%`);
-                            } else {
-                                this.upTo3('bottom', 'top',
-                                    `${e.clientY / this.state.parentHeight * 100}%`);
-                            }
-                        }
-                        break;
-                    case 'right top':
-                        if (this.possibleUpTo2(e, 2)) {
-                            this.upTo2('right top', 'left bottom',
-                                this.state.right, this.state.top);
-                        } else {
-                            if (e.clientY < this.state.minSizeOfCell ||
-                                e.clientY > this.state.parentHeight -
-                                this.state.minSizeOfCell) {
-                                this.upTo3('right', 'left',
-                                    `${e.clientX / this.state.parentWidth * 100}%`);
-                            } else {
-                                this.upTo3('top', 'bottom',
-                                    `${e.clientY / this.state.parentHeight * 100}%`);
-                            }
-                        }
-                        break;
-                    case 'right bottom':
-                        if (this.possibleUpTo2(e, 2)) {
-                            this.upTo2('right bottom', 'left top',
-                                this.state.right, this.state.bottom);
-                        } else {
-                            if (e.clientY < this.state.minSizeOfCell ||
-                                e.clientY > this.state.parentHeight -
-                                this.state.minSizeOfCell) {
-                                this.upTo3('right', 'left',
-                                    `${e.clientX / this.state.parentWidth * 100}%`);
-                            } else {
-                                this.upTo3('bottom', 'top',
-                                    `${e.clientY / this.state.parentHeight * 100}%`);
-                            }
-                        }
-                        break;
-                }
+            const arr = this.state.type.split(' ');
+
+            if (this.possibleUpTo2(e, 2)) {
+                this.upTo2(this.state.type, this.state[arr[0]],
+                    this.state[arr[1]]);
+            } else {
+                const args = (e.clientY < this.state.minSizeOfCell ||
+                    e.clientY > this.state.parentHeight -
+                    this.state.minSizeOfCell) ? {
+                        type: arr[0],
+                        distance: `${e.clientX /
+                            this.state.parentWidth * 100}%`,
+                    } : {
+                        type: arr[1],
+                        distance: `${e.clientY / 
+                            this.state.parentHeight * 100}%`,
+                    }
+
+                this.upTo3(args.type, args.distance);
+            }
         }
     }
     up3(e) {
         if (this.possibleUpTo1(e, 3)) {
             this.upTo1();
         } else {
-            switch (this.state.type) {
-                case 'top':
-                    this.upTo3('top', 'bottom',
-                        `${e.clientY / this.state.parentHeight * 100}%`);
-                    break;
-                case 'bottom':
-                    this.upTo3('bottom', 'top',
-                        `${e.clientY / this.state.parentHeight * 100}%`);
-                    break;
-                case 'left':
-                    this.upTo3('left', 'right',
-                        `${e.clientX / this.state.parentWidth * 100}%`);
-                    break;
-                case 'right':
-                    this.upTo3('right', 'left',
-                        `${e.clientX / this.state.parentWidth * 100}%`);
-                    break;
-            }
+            const position = (this.state.type === ('top' || 'bottom')) ?
+                `${e.clientY / this.state.parentHeight * 100}%` :
+                `${e.clientX / this.state.parentWidth * 100}%`;
+
+            this.upTo3(this.state.type, position);
         }
     }
 
     possibleUpTo1(e, previousState) {
+        const a = (
+            e.clientY < this.state.minSizeOfCell ||
+            e.clientY > this.state.parentHeight -
+            this.state.minSizeOfCell
+        );
+
+        const b = (
+            e.clientX < this.state.minSizeOfCell ||
+            e.clientX > this.state.parentWidth -
+            this.state.minSizeOfCell
+        );
+
         switch (previousState) {
             case 2:
-                return (e.clientY < this.state.minSizeOfCell ||
-                        e.clientY > this.state.parentHeight -
-                                    this.state.minSizeOfCell) &&
-                       (e.clientX < this.state.minSizeOfCell ||
-                        e.clientX > this.state.parentWidth -
-                                    this.state.minSizeOfCell)
+                return a && b;
             case 3:
-                return (e.clientY < this.state.minSizeOfCell ||
-                        e.clientY > this.state.parentHeight -
-                                    this.state.minSizeOfCell ||
-                        e.clientX < this.state.minSizeOfCell ||
-                        e.clientX > this.state.parentWidth -
-                                    this.state.minSizeOfCell)
+                return a || b;
         }
-    }
 
+    }
     possibleUpTo2(e, previousState) {
         switch (previousState) {
             case 2:
@@ -354,8 +234,6 @@ class Layout extends Component {
     }
 
     upTo1() {
-        const {changeLayout} = this.props;
-
         this.setState({
             ...this.state,
             currentState: 1,
@@ -368,6 +246,7 @@ class Layout extends Component {
             displayNone: '',
         });
 
+        const {changeLayout} = this.props;
         changeLayout({
             stateId: 1,
             direction: 'row',
@@ -376,9 +255,10 @@ class Layout extends Component {
             cellOf2ndTape: '100%',
         });
     }
-
-    upTo2(type, opposite, size, sizeOfCell) {
-        const {changeLayout} = this.props;
+    upTo2(type, size, sizeOfCell) {
+        const opposite = (type === 'left top') ? 'right bottom' :
+            (type === 'right bottom') ? 'left top' :
+            (type === 'left bottom') ? 'right top' : 'left bottom';
 
         this.setState({
             ...this.state,
@@ -388,6 +268,7 @@ class Layout extends Component {
             displayNone: opposite,
         });
 
+        const {changeLayout} = this.props;
         changeLayout({
             stateId: 2,
             direction: 'row',
@@ -396,14 +277,30 @@ class Layout extends Component {
             cellOf2ndTape: sizeOfCell,
         });
     }
+    upTo3(type, size) {
+        const direction = type === ('top' || 'bottom') ? 'column' : 'row';
+        const opposite = (type === 'top') ? 'bottom' :
+            (type === 'bottom') ? 'top' :
+            (type === 'left') ? 'right' : 'left';
 
-    upTo3(type, opposite, size) {
+        let splitters = {
+            top: '0%',
+            bottom: '100%',
+            left: '0%',
+            right: '100%',
+        }
+        delete splitters[type];
+
+        this.setState({
+            ...this.state,
+            currentState: 3,
+            isDragging: false,
+            type: type,
+            ...splitters,
+            displayNone: opposite,
+        });
+
         const {changeLayout} = this.props;
-
-        const direction = type === ('top' || 'bottom')
-            ? 'column'
-            : 'row';
-
         changeLayout({
             stateId: 3,
             direction,
@@ -411,61 +308,6 @@ class Layout extends Component {
             cellOf1stTape: '100%',
             cellOf2ndTape: '100%',
         });
-
-        switch (type) {
-
-            case 'top':
-                this.setState({
-                    ...this.state,
-                    currentState: 3,
-                    isDragging: false,
-                    type: type,
-                    bottom: '100%',
-                    left: '0%',
-                    right: '100%',
-                    displayNone: opposite,
-                });
-                break;
-
-            case 'bottom':
-                this.setState({
-                    ...this.state,
-                    currentState: 3,
-                    isDragging: false,
-                    type: type,
-                    top: '0%',
-                    left: '0%',
-                    right: '100%',
-                    displayNone: opposite,
-                });
-                break;
-
-            case 'left':
-                this.setState({
-                    ...this.state,
-                    currentState: 3,
-                    isDragging: false,
-                    type: type,
-                    top: '0%',
-                    bottom: '100%',
-                    right: '100%',
-                    displayNone: opposite,
-                });
-                break;
-
-            case 'right':
-                this.setState({
-                    ...this.state,
-                    currentState: 3,
-                    isDragging: false,
-                    type: type,
-                    top: '0%',
-                    bottom: '100%',
-                    left: '0%',
-                    displayNone: opposite,
-                });
-                break;
-        }
     }
 
     mouseDownLine(e) {
