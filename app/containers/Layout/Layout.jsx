@@ -396,6 +396,7 @@ class Layout extends Component {
             cellOf2ndTape: sizeOfCell,
         });
     }
+
     upTo3(type, opposite, size) {
         const {changeLayout} = this.props;
 
@@ -521,7 +522,7 @@ class Layout extends Component {
                 <Tape
                     type={'tape'}
                     direction={(this.props.layout.direction === 'row') ? 'column' : 'row'}
-                    size={this.state.tape}
+                    size={this.props.layout.tape}
                 >
                     <Tape
                         type={'cell'}
@@ -535,7 +536,7 @@ class Layout extends Component {
                 <Tape
                     type={'tape'}
                     direction={(this.props.layout.direction === 'row') ? 'column' : 'row'}
-                    size={`${100 - parseFloat(this.state.tape)}%`}
+                    size={`${100 - parseFloat(this.props.layout.tape)}%`}
                 >
                     <Tape
                         type={'cell'}
