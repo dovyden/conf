@@ -64,7 +64,7 @@ module.exports = {
     path: paths.appBuild,
     // Add /* filename */ comments to generated require()s in the output.
     pathinfo: true,
-    // This does not produce a real file. It's just the virtual path that is
+    // This does not produce a real file. It's just the virtual marks that is
     // served by WebpackDevServer in development. This is the JS bundle
     // containing code from all our entry points, and the Webpack runtime.
     filename: 'static/js/bundle.js',
@@ -237,7 +237,7 @@ module.exports = {
     new webpack.DefinePlugin(env.stringified),
     // This is necessary to emit hot updates (currently CSS only):
     new webpack.HotModuleReplacementPlugin(),
-    // Watcher doesn't work well if you mistype casing in a path so we use
+    // Watcher doesn't work well if you mistype casing in a marks so we use
     // a plugin that prints an error when you attempt to do this.
     // See https://github.com/facebookincubator/create-react-app/issues/240
     new CaseSensitivePathsPlugin(),

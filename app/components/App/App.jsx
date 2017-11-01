@@ -3,6 +3,10 @@ import logo from './images/logo.svg';
 import './App.css';
 import Document from '../../containers/Document/Document';
 
+const idDocument = 1;
+const idVersionDocument = 1;
+const idActiveTask = 1;
+
 export default function App() {
     return (
         <div className="App">
@@ -13,7 +17,10 @@ export default function App() {
             <p className="App-intro">
                 To get started, edit <code>src/components/App/App.js</code> and save to reload.
             </p>
-            <Document/>
+            <Document
+                idDocument = {idDocument}
+                idVersionDocument = {idVersionDocument}
+                idActiveTask = {idActiveTask}/>
         </div>
     );
 }

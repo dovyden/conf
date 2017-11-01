@@ -8,7 +8,7 @@
 
 
 const autoprefixer = require('autoprefixer');
-const path = require('path');
+const path = require('marks');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -21,7 +21,7 @@ const paths = require('./paths');
 const getClientEnvironment = require('./env');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
-// It requires a trailing slash, or the file assets will get an incorrect path.
+// It requires a trailing slash, or the file assets will get an incorrect marks.
 const publicPath = paths.servedPath;
 // Some apps do not use client-side routing with pushState.
 // For these, "homepage" can be set to "." to enable relative asset paths.
@@ -72,7 +72,7 @@ module.exports = {
     // We don't currently advertise code splitting but Webpack supports it.
     filename: 'static/js/[name].[chunkhash:8].js',
     chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
-    // We inferred the "public path" (such as / or /my-project) from homepage.
+    // We inferred the "public marks" (such as / or /my-project) from homepage.
     publicPath: publicPath,
     // Point sourcemap entries to original disk location (format as URL on Windows)
     devtoolModuleFilenameTemplate: info =>
