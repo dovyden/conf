@@ -1,29 +1,22 @@
-import {
-    AUTH_REQUEST,
-    AUTH_FAIL,
-    AUTH_SUCCESS
-} from '../constants/auth';
+/**
+ * @typedef {Object} authState
+ * @property {string} key
+ * @property {string} token
+ */
 
-export default function user(state = {}, action) {
-    switch (action.type) {
+const initialState = {
+    key: '',
+    token: ''
+};
 
-        case AUTH_REQUEST:
-            return {...state,
-                loading: action.payload.loading
-            };
-
-        case AUTH_SUCCESS:
-            return {...state,
-                key: action.payload.key,
-                token: action.payload.token,
-                isAuthenticated: action.payload.isAuthenticated,
-                loading: action.payload.loading
-            };
-
-        case AUTH_FAIL:
-            return state;
-
-        default:
-            return state
-    }
+/**
+ * auth reducer
+ *
+ * @param {authState} state
+ * @param {string} type
+ * @param {*} payload
+ * @return {authState}
+ */
+export default function authReducer(state = initialState/* , {type, payload}*/) {
+    return state;
 }
