@@ -7,7 +7,6 @@ import LayoutComponent from '../../components/Layout/Layout';
 import Tape from '../../components/Layout/Tape';
 import Splitter from '../../components/Layout/Splitter';
 
-
 function unFocus(document, window) {
     if (document.selection) {
         document.selection.empty();
@@ -18,7 +17,6 @@ function unFocus(document, window) {
     }
 }
 
-
 class Layout extends Component {
     constructor(props) {
         super(props);
@@ -28,9 +26,9 @@ class Layout extends Component {
             bottom: '100%',
             left: '0%',
             right: '100%',
-            displayNone: '',                //display: none for splitters   change on hiddenSplitters
+            hiddenSplitters: '',            //display: none for splitters
 
-            type: '',                       //type of dragging              change on draggingSplitters
+            draggingSplitters: '',          //type of dragging
             isDragging: false,              //state of dragging
             parentWidth: 0,                 //of tape
             parentHeight: 0,                //depend on size of splitter
@@ -91,7 +89,7 @@ class Layout extends Component {
         }
     }
     down3(e) {
-        if (e.target.dataset.type === this.state.type) {
+        if (e.target.dataset.type === this.state.draggingSplitters) {
             this.downTo3(e, e.target.dataset.type);
         } else {
             this.downTo4();         // e.target.dataset.type: top, bottom, ...
@@ -107,16 +105,16 @@ class Layout extends Component {
                     this.state.sizeOfBox) ? 'bottom' : '';
     }
 
-    downTo2(e, type) {
-        const opposite = (type === 'left top') ? 'right bottom' :
-            (type === 'right bottom') ? 'left top' :
-            (type === 'left bottom') ? 'right top' : 'left bottom';
+    downTo2(e, types) {
+        const opposite = (types === 'left top') ? 'right bottom' :
+            (types === 'right bottom') ? 'left top' :
+            (types === 'left bottom') ? 'right top' : 'left bottom';
 
         this.setState({
             ...this.state,
             currentState: 2,
-            type: type,
-            displayNone: opposite,
+            draggingSplitters: types,
+            hiddenSplitters: opposite,
             isDragging: true,
 
             parentHeight: e.target.parentElement.clientHeight,
@@ -131,8 +129,8 @@ class Layout extends Component {
         this.setState({
             ...this.state,
             currentState: 3,
-            type: type,
-            displayNone: opposite,
+            draggingSplitters: type,
+            hiddenSplitters: opposite,
             isDragging: true,
 
             parentHeight: e.target.parentElement.clientHeight,
@@ -143,7 +141,7 @@ class Layout extends Component {
     downTo5 = (e) => {}
 
     move2(e) {
-        const arr = this.state.type.split(' ');
+        const arr = this.state.draggingSplitters.split(' ');
 
         this.setState({
             ...this.state,
@@ -152,13 +150,14 @@ class Layout extends Component {
         });
     }
     move3(e) {
-        const position = (this.state.type === ('top' || 'bottom')) ?
+        const position = (this.state.draggingSplitters === 'top' ||
+            this.state.draggingSplitters === 'bottom') ?
             `${e.clientY / this.state.parentHeight * 100}%` :
             `${e.clientX / this.state.parentWidth * 100}%`;
 
         this.setState({
             ...this.state,
-            [this.state.type]: position,
+            [this.state.draggingSplitters]: position,
         });
     }
 
@@ -166,10 +165,10 @@ class Layout extends Component {
         if (this.possibleUpTo1(e, 2)) {
             this.upTo1();
         } else {
-            const arr = this.state.type.split(' ');
+            const arr = this.state.draggingSplitters.split(' ');
 
             if (this.possibleUpTo2(e, 2)) {
-                this.upTo2(this.state.type, this.state[arr[0]],
+                this.upTo2(this.state.draggingSplitters, this.state[arr[0]],
                     this.state[arr[1]]);
             } else {
                 const args = (e.clientY < this.state.minSizeOfCell ||
@@ -192,11 +191,11 @@ class Layout extends Component {
         if (this.possibleUpTo1(e, 3)) {
             this.upTo1();
         } else {
-            const position = (this.state.type === ('top' || 'bottom')) ?
+            const position = (this.state.draggingSplitters === ('top' || 'bottom')) ?
                 `${e.clientY / this.state.parentHeight * 100}%` :
                 `${e.clientX / this.state.parentWidth * 100}%`;
 
-            this.upTo3(this.state.type, position);
+            this.upTo3(this.state.draggingSplitters, position);
         }
     }
 
@@ -238,12 +237,12 @@ class Layout extends Component {
             ...this.state,
             currentState: 1,
             isDragging: false,
-            type: '',
+            draggingSplitters: '',
             top: '0%',
             bottom: '100%',
             left: '0%',
             right: '100%',
-            displayNone: '',
+            hiddenSplitters: '',
         });
 
         const {changeLayout} = this.props;
@@ -255,17 +254,17 @@ class Layout extends Component {
             cellOf2ndTape: '100%',
         });
     }
-    upTo2(type, size, sizeOfCell) {
-        const opposite = (type === 'left top') ? 'right bottom' :
-            (type === 'right bottom') ? 'left top' :
-            (type === 'left bottom') ? 'right top' : 'left bottom';
+    upTo2(types, size, sizeOfCell) {
+        const opposite = (types === 'left top') ? 'right bottom' :
+            (types === 'right bottom') ? 'left top' :
+            (types === 'left bottom') ? 'right top' : 'left bottom';
 
         this.setState({
             ...this.state,
             currentState: 2,
             isDragging: false,
-            type: type,
-            displayNone: opposite,
+            draggingSplitters: types,
+            hiddenSplitters: opposite,
         });
 
         const {changeLayout} = this.props;
@@ -295,9 +294,9 @@ class Layout extends Component {
             ...this.state,
             currentState: 3,
             isDragging: false,
-            type: type,
+            draggingSplitters: type,
             ...splitters,
-            displayNone: opposite,
+            hiddenSplitters: opposite,
         });
 
         const {changeLayout} = this.props;
@@ -357,13 +356,30 @@ class Layout extends Component {
                 direction={this.props.layout.direction}
                 mousedown={this.mouseDownLine.bind(this)}
             >
-                <Splitter type={'top'} position={this.state.top} display = {this.state.displayNone}/>
-                <Splitter type={'bottom'} position={this.state.bottom} display = {this.state.displayNone}/>
-                <Splitter type={'left'} position={this.state.left} display = {this.state.displayNone}/>
-                <Splitter type={'right'} position={this.state.right} display = {this.state.displayNone}/>
+                <Splitter
+                    type={'top'}
+                    position={this.state.top}
+                    display = {this.state.hiddenSplitters}
+                />
+                <Splitter
+                    type={'bottom'}
+                    position={this.state.bottom}
+                    display = {this.state.hiddenSplitters}
+                />
+                <Splitter
+                    type={'left'}
+                    position={this.state.left}
+                    display = {this.state.hiddenSplitters}
+                />
+                <Splitter
+                    type={'right'}
+                    position={this.state.right}
+                    display = {this.state.hiddenSplitters}
+                />
                 <Tape
                     type={'tape'}
-                    direction={(this.props.layout.direction === 'row') ? 'column' : 'row'}
+                    direction={(this.props.layout.direction === 'row') ?
+                        'column' : 'row'}
                     size={this.props.layout.tape}
                 >
                     <Tape
@@ -372,13 +388,16 @@ class Layout extends Component {
                     />
                     <Tape
                         type={'cell'}
-                        size={`${100 - parseFloat(this.props.layout.cellOf1stTape)}%`}
+                        size={`${100 -
+                            parseFloat(this.props.layout.cellOf1stTape)}%`}
                     />
                 </Tape>
                 <Tape
                     type={'tape'}
-                    direction={(this.props.layout.direction === 'row') ? 'column' : 'row'}
-                    size={`${100 - parseFloat(this.props.layout.tape)}%`}
+                    direction={(this.props.layout.direction === 'row') ?
+                        'column' : 'row'}
+                    size={`${100 -
+                        parseFloat(this.props.layout.tape)}%`}
                 >
                     <Tape
                         type={'cell'}
@@ -386,7 +405,8 @@ class Layout extends Component {
                     />
                     <Tape
                         type={'cell'}
-                        size={`${100 - parseFloat(this.props.layout.cellOf2ndTape)}%`}
+                        size={`${100 -
+                            parseFloat(this.props.layout.cellOf2ndTape)}%`}
                     />
                 </Tape>
             </LayoutComponent>
