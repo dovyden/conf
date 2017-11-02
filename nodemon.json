@@ -1,0 +1,15 @@
+{
+  "verbose": true,
+  "ignore": [
+    "build/",
+    "node_modules/",
+    "*.md"
+  ],
+  "execMap": {
+    "js": "node"
+  },
+  "env": {
+    "DEBUG": "app:*",
+    "APP_ENV": "development"
+  }
+}
