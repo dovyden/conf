@@ -20,15 +20,15 @@
     position: absolute;
     left: 0;
     right: 0;
-    height: 20px;
+    height: 4px;
     background: #006378;
 }
 
 .splitter_bottom {
     position: absolute;
-    margin-top: -20px;
+    margin-top: -4px;
     left: 0;
-    height: 20px;
+    height: 4px;
     right: 0;
     background: #006378;
 }
@@ -37,15 +37,15 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 20px;
+    width: 4px;
     background: #006378;
 }
 
 .splitter_right {
     position: absolute;
     top: 0;
-    margin-left: -20px;
+    margin-left: -4px;
     bottom: 0;
-    width: 20px;
+    width: 4px;
     background: #006378;
 }

@@ -21,7 +21,7 @@ class Layout extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentState: this.props.layout.stateId,
+            currentState: this.props.layout.root.state,
             top: '0%',                      //4 splitters
             bottom: '100%',
             left: '0%',
@@ -208,6 +208,7 @@ class Layout extends Component {
     }
     up3(e) {
         if (this.possibleUpTo1(e, 3)) {
+
             this.upTo1();
         } else {
             const pos = (this.state.draggingSplitters === 'top' ||
@@ -252,7 +253,7 @@ class Layout extends Component {
         }
     }
 
-    upTo1() {
+    upTo1(contentId) {
         this.setState({
             ...this.state,
             currentState: 1,
@@ -267,11 +268,12 @@ class Layout extends Component {
 
         const {changeLayout} = this.props;
         changeLayout({
-            stateId: 1,
+            state: 1,
             direction: 'row',
             tape: '100%',
             cellOf1stTape: '100%',
             cellOf2ndTape: '100%',
+            contentId: [contentId, null, null, null];
         });
     }
     upTo2(types, size, sizeOfCell) {
@@ -373,7 +375,7 @@ class Layout extends Component {
     render() {
         return (
             <LayoutComponent
-                direction={this.props.layout.direction}
+                direction={this.props.layout.root.direction}
                 mousedown={this.mouseDownLine.bind(this)}
             >
                 <Splitter
@@ -398,36 +400,33 @@ class Layout extends Component {
                 />
                 <Tape
                     type={'tape'}
-                    direction={(this.props.layout.direction === 'row') ?
+                    direction={(this.props.layout.root.direction === 'row') ?
                         'column' : 'row'}
-                    size={this.props.layout.tape}
+                    size={this.props.layout.tape[0]}
                 >
                     <Tape
                         type={'cell'}
-                        size={this.props.layout.cellOf1stTape}
-                    />
+                        size={this.props.layout.cell[0].flexBasis}
+                    >{this.props.layout.cell[0].contentId}</Tape>
                     <Tape
                         type={'cell'}
-                        size={`${100 -
-                            parseFloat(this.props.layout.cellOf1stTape)}%`}
-                    />
+                        size={this.props.layout.cell[1].flexBasis}
+                    >{this.props.layout.cell[1].contentId}</Tape>
                 </Tape>
                 <Tape
                     type={'tape'}
-                    direction={(this.props.layout.direction === 'row') ?
+                    direction={(this.props.layout.root.direction === 'row') ?
                         'column' : 'row'}
-                    size={`${100 -
-                        parseFloat(this.props.layout.tape)}%`}
+                    size={this.props.layout.tape[1]}
                 >
                     <Tape
                         type={'cell'}
-                        size={this.props.layout.cellOf2ndTape}
-                    />
+                        size={this.props.layout.cell[2].flexBasis}
+                    >{this.props.layout.cell[2].contentId}</Tape>
                     <Tape
                         type={'cell'}
-                        size={`${100 -
-                            parseFloat(this.props.layout.cellOf2ndTape)}%`}
-                    />
+                        size={this.props.layout.cell[3].flexBasis}
+                    >{this.props.layout.cell[3].contentId}</Tape>
                 </Tape>
             </LayoutComponent>
         );
