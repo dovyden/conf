@@ -1,0 +1,121 @@
+.dr {
+    width: 415px;
+    height: 600px;
+    border-radius: 3px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16);
+}
+
+.dr-header {
+    display: flex;
+    height: 64px;
+    background-color: #6c8da7;
+    padding: 0 8px;
+}
+
+.dr-header__filter {
+    flex-direction: row;
+    justify-content: flex-start;
+    margin: auto 8px;
+    width: 72px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+}
+
+.dr-header__filter:hover {
+    height: 24px;
+    border-radius: 3px;
+    background-color: #89a6bd;
+}
+
+.dr-header__filter-text {
+    font-family: Arial;
+    font-size: 13px;
+    color: #ffffff;
+}
+
+.dr-document-list {
+    height: 500px;
+    overflow: auto;
+    margin-bottom: 5px;
+}
+
+.dr-document-list__item {
+    margin-bottom: 1px;
+}
+
+.dr-version-list {
+}
+
+.dr-version-list__item {
+    margin-bottom: 1px;
+}
+
+.dr-task-list {
+}
+
+.dr-task-list__item {
+    border-bottom: solid 1px #d9d9d9;
+}
+
+.dr-task-list__item:hover {
+    background-color: #f6eee2;
+}
+
+.dr-tab {
+    height: 34px;
+    line-height: 34px;
+    padding: 0 8px;
+    text-align: left;
+}
+
+.dr-tab_document-active {
+    background-color: #89a6bd;
+}
+
+.dr-tab_document-not-active {
+    background-color: #aaa49b;
+}
+
+.dr-tab_version-active {
+    background-color: #94bda8;
+}
+
+.dr-tab_version-not-active {
+    background-color: #aa9094;
+}
+
+.dr-tab__state {
+    width: 12px;
+    display: inline-block;
+    font-family: Arial;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    color: #eeeeed;
+}
+
+.dr-tab__name {
+    margin: 0 8px;
+    display: inline-block;
+    font-family: Arial;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: left;
+    color: #ffffff;
+}
+
+.dr-tab__created {
+    display: inline-block;
+    float: right;
+    font-family: Arial;
+    font-size: 13px;
+    text-align: left;
+    color: #eeeeed;
+}
+
+.dr-task {
+    height: 280px;
+    padding: 12px;
+}
