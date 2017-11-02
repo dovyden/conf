@@ -1,21 +1,7 @@
-export const saveToLocalStorage = (type, payload) => {
+export const saveToLocalStorage = (payload) => {
+    const serializedState = JSON.stringify(payload);
     try {
-        localStorage.setItem(type, payload);
-    } catch (err) {
-        return undefined;
-    }
-};
-
-export const loadState = () => {
-    try {
-        const key = localStorage.getItem('key');
-        const token = localStorage.getItem('token');
-        return (key && token) ? {
-            auth: {
-                key,
-                token
-            }
-        } : {};
+        localStorage.setItem('auth', serializedState);
     } catch (err) {
         return undefined;
     }

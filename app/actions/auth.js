@@ -3,7 +3,7 @@ import {
     AUTH_FAIL
 } from '../constants/auth';
 
-import fetch from '../utils/fetch';
+import {fetchApi} from '../utils/fetch';
 import {saveToLocalStorage} from '../utils/localStorage';
 
 const successAuth = (key, token, login) => ({
@@ -27,7 +27,7 @@ const failAuth = ({error, message}, key) => ({
 
 export const authentication = (key) => {
     return (dispatch) => {
-        fetch('/user/AUTH', {body: {
+        fetchApi('user/AUTH', {body: {
             key
         }}).then(res => {
             return res.json();
@@ -37,10 +37,11 @@ export const authentication = (key) => {
             } else {
                 dispatch(successAuth(key, json.token, json.login));
 
-                // what should I do with json.login?
-                saveToLocalStorage('key', key);
-                saveToLocalStorage('token', json.token);
-                saveToLocalStorage('login', json.login);
+                saveToLocalStorage({
+                    key,
+                    token: json.token,
+                    login: json.login,
+                });
             }
         });
     };

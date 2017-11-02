@@ -10,7 +10,19 @@ import {
 import thunk from 'redux-thunk';
 
 import reducers from '../reducers';
-import {loadState} from './localStorage';
+
+const loadState = () => {
+    try {
+        const state = localStorage.getItem('auth');
+        const serializedState = JSON.parse(state);
+
+        return serializedState ? {
+            auth: serializedState
+        } : {};
+    } catch (err) {
+        return undefined;
+    }
+};
 
 // add middlewares to redux store
 const middlewares = [thunk];
@@ -28,6 +40,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // restore state-store from localStorage
 const persistedState = loadState();
+
 
 // create store
 export default createStore(

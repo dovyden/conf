@@ -58,7 +58,7 @@ class Auth extends Component {
 
         return (
             <div>
-                {loading ? <Spinner className="center__spinner"/> : null}
+                {loading ? <Spinner position="center"/> : null}
                 {fromURL ? null : <AuthForm onClick={this.addToken} loading={loading} message={message} />}
             </div>
         );

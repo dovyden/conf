@@ -6,12 +6,15 @@ import './Spinner.css';
 
 const b = b_.lock('spinner');
 
-export default function Spinner({className}) {
+export default function Spinner({position}) {
     return (
-        <div className={b.mix(className)} />
+        <div className={position
+            ? b.mix(`spinner__${position}`)
+            : b.mix()}
+        />
     );
 }
 
 Spinner.propTypes = {
-    className: PropTypes.string,
+    position: PropTypes.string,
 };
