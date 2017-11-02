@@ -32,6 +32,8 @@ class Layout extends Component {
             isDragging: false,              //state of dragging
             parentWidth: 0,                 //of tape
             parentHeight: 0,                //depend on size of splitter
+            offsetX: 0,
+            offsetY: 0,
 
             minSizeOfCell: 50,              //for creating and deleting     change on minSizeOfTape
             sizeOfBox: 20,                  //for dragging intersection point
@@ -109,6 +111,7 @@ class Layout extends Component {
         const opposite = (types === 'left top') ? 'right bottom' :
             (types === 'right bottom') ? 'left top' :
             (types === 'left bottom') ? 'right top' : 'left bottom';
+        const arr = types.split(' ');
 
         this.setState({
             ...this.state,
@@ -119,12 +122,21 @@ class Layout extends Component {
 
             parentHeight: e.target.parentElement.clientHeight,
             parentWidth: e.target.parentElement.clientWidth,
+            offsetX: e.clientX - parseFloat(this.state[arr[0]]) *
+                e.target.parentElement.clientWidth / 100,
+            offsetY: e.clientY - parseFloat(this.state[arr[1]]) *
+                e.target.parentElement.clientHeight / 100,
         });
     }
     downTo3(e, type) {
         const opposite = (type === 'top') ? 'bottom' :
             (type === 'bottom') ? 'top' :
             (type === 'left') ? 'right' : 'left';
+        const arr = (type === 'left' || type === 'right') ?
+            [e.clientX - parseFloat(this.state[type]) *
+                e.target.parentElement.clientWidth / 100, 0] :
+            [0, e.clientY - parseFloat(this.state[type]) *
+                e.target.parentElement.clientHeight / 100];
 
         this.setState({
             ...this.state,
@@ -135,6 +147,8 @@ class Layout extends Component {
 
             parentHeight: e.target.parentElement.clientHeight,
             parentWidth: e.target.parentElement.clientWidth,
+            offsetX: arr[0],
+            offsetY: arr[1],
         });
     }
     downTo4 = (e) => {}
@@ -145,15 +159,17 @@ class Layout extends Component {
 
         this.setState({
             ...this.state,
-            [arr[0]]: `${e.clientX / this.state.parentWidth * 100}%`,
-            [arr[1]]: `${e.clientY / this.state.parentHeight * 100}%`,
+            [arr[0]]: `${(e.clientX - this.state.offsetX) / 
+                this.state.parentWidth * 100}%`,
+            [arr[1]]: `${(e.clientY - this.state.offsetY) /
+                this.state.parentHeight * 100}%`,
         });
     }
     move3(e) {
         const position = (this.state.draggingSplitters === 'top' ||
             this.state.draggingSplitters === 'bottom') ?
-            `${e.clientY / this.state.parentHeight * 100}%` :
-            `${e.clientX / this.state.parentWidth * 100}%`;
+            `${(e.clientY - this.state.offsetY) / this.state.parentHeight * 100}%` :
+            `${(e.clientX - this.state.offsetX) / this.state.parentWidth * 100}%`;
 
         this.setState({
             ...this.state,
@@ -168,18 +184,21 @@ class Layout extends Component {
             const arr = this.state.draggingSplitters.split(' ');
 
             if (this.possibleUpTo2(e, 2)) {
-                this.upTo2(this.state.draggingSplitters, this.state[arr[0]],
-                    this.state[arr[1]]);
+                this.upTo2(this.state.draggingSplitters,
+                    `${(parseFloat(this.state[arr[0]]) + this.state.offsetX / 
+                        this.state.parentWidth * 100)}%`,
+                    `${(parseFloat(this.state[arr[1]]) + this.state.offsetY / 
+                        this.state.parentHeight * 100)}%`);
             } else {
                 const args = (e.clientY < this.state.minSizeOfCell ||
                     e.clientY > this.state.parentHeight -
                     this.state.minSizeOfCell) ? {
                         type: arr[0],
-                        distance: `${e.clientX /
+                        distance: `${(e.clientX - this.state.offsetX) /
                             this.state.parentWidth * 100}%`,
                     } : {
                         type: arr[1],
-                        distance: `${e.clientY / 
+                        distance: `${(e.clientY - this.state.offsetY) / 
                             this.state.parentHeight * 100}%`,
                     }
 
@@ -191,11 +210,12 @@ class Layout extends Component {
         if (this.possibleUpTo1(e, 3)) {
             this.upTo1();
         } else {
-            const position = (this.state.draggingSplitters === ('top' || 'bottom')) ?
+            const pos = (this.state.draggingSplitters === 'top' ||
+                this.state.draggingSplitters === 'bottom') ?
                 `${e.clientY / this.state.parentHeight * 100}%` :
                 `${e.clientX / this.state.parentWidth * 100}%`;
 
-            this.upTo3(this.state.draggingSplitters, position);
+            this.upTo3(this.state.draggingSplitters, pos);
         }
     }
 
