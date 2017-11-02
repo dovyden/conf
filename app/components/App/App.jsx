@@ -2,6 +2,8 @@ import React from 'react';
 import logo from './images/logo.svg';
 import './App.css';
 
+import DynamicReport from '../../containers/DynamicReport/DynamicReport';
+
 export default function App() {
     return (
         <div className="App">
@@ -10,8 +12,9 @@ export default function App() {
                 <h1 className="App-title">Welcome to React</h1>
             </header>
             <p className="App-intro">
-                To get started, edit <code>src/components/App/App.js</code> and save to reload.
+             To get started, edit <code>src/components/App/App.js</code> and save to reload.
             </p>
+            <DynamicReport/>
         </div>
     );
 }
