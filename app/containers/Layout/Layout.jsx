@@ -273,7 +273,7 @@ class Layout extends Component {
             tape: '100%',
             cellOf1stTape: '100%',
             cellOf2ndTape: '100%',
-            contentId: [contentId, null, null, null];
+            contentId: [contentId, null, null, null]
         });
     }
     upTo2(types, size, sizeOfCell) {
