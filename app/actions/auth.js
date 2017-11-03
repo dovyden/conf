@@ -4,7 +4,7 @@ import {
 } from '../constants/auth';
 
 import {fetchApi} from '../utils/fetch';
-import {saveToLocalStorage} from '../utils/localStorage';
+import {save} from '../utils/localStorage';
 
 const successAuth = (key, token, login) => ({
     type: AUTH_SUCCESS,
@@ -37,7 +37,7 @@ export const authentication = (key) => {
             } else {
                 dispatch(successAuth(key, json.token, json.login));
 
-                saveToLocalStorage({
+                save('auth', {
                     key,
                     token: json.token,
                     login: json.login,

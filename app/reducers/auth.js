@@ -6,7 +6,6 @@ import {
 const initialState = {
     key: null,
     token: null,
-    error: {}
 };
 
 export default function user(state = initialState, action) {

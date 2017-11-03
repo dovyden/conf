@@ -78,9 +78,11 @@ Auth.propTypes = {
 };
 
 function mapStateToProps(state) {
-    return {
+    return state.auth.error ? {
         error: state.auth.error.code,
         message: state.auth.error.message,
+        isAuthenticated: state.auth.isAuthenticated
+    } : {
         isAuthenticated: state.auth.isAuthenticated
     };
 }
