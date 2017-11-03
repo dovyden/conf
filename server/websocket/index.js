@@ -1,17 +1,16 @@
 'use strict';
 
-const config = require('../configs/socket');
+const config = require('../libs/config');
+const soketIO = require('socket.io');
 
 module.exports = (server) => {
 
-    const io = require('socket.io')(server, config);
+    const io = soketIO(server, config.websockets);
 
     io.on('connection', (socket) => {
 
         socket
-            .on('message', (data) => {
-
-                const {type, payload} = data;
+            .on('message', ({type, payload}) => {
 
                 switch (type) {
                     case 'example':

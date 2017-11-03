@@ -46,9 +46,8 @@ try {
     // start listening for incoming requests
     const server = app.listen(config.port, () => {
         coreLogger.log(`App is listening to requests (port ${config.port})`);
-
     });
-    const io = require('./socket')(server);
+    const io = require('./websocket')(server);
 
 } catch (ex) {
     coreLogger.error(`Configuring app error: ${ex.stack}`);
