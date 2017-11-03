@@ -44,7 +44,7 @@ try {
     useMiddlewares(app);
 
     // start listening for incoming requests
-    app.listen(config.port, () => {
+    const server = app.listen(config.port, () => {
         coreLogger.log(`App is listening to requests (port ${config.port})`);
     });
 } catch (ex) {
