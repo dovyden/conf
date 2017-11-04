@@ -15,30 +15,32 @@ class App extends Component {
 
     componentDidMount() {
         const {token} = this.props;
-        const auth = this.getUrlParam();
+        const {pathname} = this.props.location;
+        const auth = this.getUrlParam(pathname);
 
-        const path = token ? '/' : '/auth';
+        const path = token ? pathname : '/auth';
 
-        // Example: url = 'test.com/auth/:key?' and doesn't exist token at store -> just render
+        // Example: url = 'test.com/auth/:key?' and doesn't exist token at store ->
+        // just render process auth with this key
         if (auth && !token) {
             return;
         }
-        // if I have token - redirect to '/', otherwise I haven't token and 'auth' at url - redirect to '/auth'
+        // if I have token - redirect to pathname (that placed in url),
+        // otherwise I haven't token and 'auth' at url - redirect to '/auth'
         this.props.history.replace(path);
     }
 
-    getUrlParam() {
-        const path = window.location.pathname;
-        const params = path.split('/');
+    getUrlParam(pathname) {
+        const params = pathname.split('/');
 
-        return params[1];
+        return params[1] === 'auth';
     }
 
     render() {
         return (
             <Switch>
-                <Route exact path={'/'} component={AppComponent}/>
                 <Route exact path={'/auth/:key?'} component={Auth}/>
+                <Route path={'/'} component={AppComponent}/>
             </Switch>
         );
     }
@@ -46,6 +48,7 @@ class App extends Component {
 
 App.propTypes = {
     history: PropTypes.object,
+    location: PropTypes.object,
     token: PropTypes.string
 };
 

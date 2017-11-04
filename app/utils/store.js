@@ -1,7 +1,6 @@
 import {
     applyMiddleware,
     combineReducers,
-    compose,
     createStore
 } from 'redux';
 import {
@@ -14,7 +13,6 @@ import reducers from '../reducers';
 
 // add middlewares to redux store
 const middlewares = [thunk];
-let composeEnhancers = compose;
 
 if (process.env.NODE_ENV === 'development') {
     middlewares.push(logger({
@@ -22,8 +20,6 @@ if (process.env.NODE_ENV === 'development') {
         diff: true,
         duration: true
     }));
-    // Redux_Dev_Tools extension
-    composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 }
 
 // restore state-store from localStorage
@@ -32,7 +28,5 @@ const persistedState = load('auth');
 export default createStore(
     combineReducers(reducers),
     persistedState,  // initial store
-    composeEnhancers(
-        applyMiddleware(...middlewares)
-    )
+    applyMiddleware(...middlewares)
 );

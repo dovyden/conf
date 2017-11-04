@@ -6,37 +6,44 @@ import './Auth.css';
 export default class Auth extends Component {
     constructor(props) {
         super(props);
+        this.state = {message: ''};
 
-        this.onPressSubmit = this.onPressSubmit.bind(this);
-        this.onInputArea = this.onInputArea.bind(this);
+        this.onSubmitForm = this.onSubmitForm.bind(this);
+        this.newRefKey = this.newRefKey.bind(this);
     }
 
-    onPressSubmit(e) {
+    componentWillReceiveProps(nextProps) {
+        this.setState({message: nextProps.message || ''});
+    }
+
+    onSubmitForm(e) {
         e.preventDefault();
 
-        const {onClick} = this.props;
+        const {onSubmit} = this.props;
 
         if (!this.inputKey.value) {
-            alert(`Field can't be empty`);
+            this.setState({message: 'Field can\'t be empty'});
             return;
         }
-        onClick(this.inputKey.value);
+        onSubmit(this.inputKey.value);
         this.inputKey.value = '';
     }
 
-    onInputArea(refKey) {
-        this.inputKey = refKey;
+    newRefKey(input) {
+        this.inputKey = input;
     }
 
     render() {
-        const {loading, message} = this.props;
+        const {loading} = this.props;
+        const {message} = this.state;
+
         return (
             <div className="auth">
-                <form className="auth-form" onSubmit={this.onPressSubmit}>
-                    {message ? <div className="message">{message}</div> : null}
-                    <input ref={this.onInputArea} placeholder="Type a Key" disabled={loading}/>
+                <form className="auth-form" onSubmit={this.onSubmitForm}>
+                    <input ref={this.newRefKey} placeholder="Type a Key" disabled={loading}/>
                     <button type="submit">Get Token</button>
                 </form>
+                {message ? <div className="auth__message">{message}</div> : null}
             </div>
         );
 
@@ -47,5 +54,5 @@ Auth.propTypes = {
     loading: PropTypes.bool,
     message: PropTypes.string,
     fromURL: PropTypes.any,
-    onClick: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired,
 };

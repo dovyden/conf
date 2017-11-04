@@ -13,14 +13,14 @@ class Auth extends Component {
         this.state = {loading: true};
 
         this.checkURL = this.checkURL.bind(this);
-        this.addToken = this.addToken.bind(this);
+        this.startGetToken = this.startGetToken.bind(this);
     }
 
     componentDidMount() {
         this.keyFromURL = this.checkURL();
 
         if (this.keyFromURL) {
-            this.addToken(this.keyFromURL);
+            this.startGetToken(this.keyFromURL);
         } else {
             this.setState({loading: false});
         }
@@ -45,7 +45,7 @@ class Auth extends Component {
         return (key) ? key : false;
     }
 
-    addToken(key) {
+    startGetToken(key) {
         const {auth} = this.props;
 
         this.setState({loading: true});
@@ -59,7 +59,7 @@ class Auth extends Component {
         return (
             <div>
                 {loading ? <Spinner position="center"/> : null}
-                {fromURL ? null : <AuthForm onClick={this.addToken} loading={loading} message={message} />}
+                {fromURL ? null : <AuthForm onSubmit={this.startGetToken} loading={loading} message={message} />}
             </div>
         );
     }

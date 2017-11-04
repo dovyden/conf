@@ -7,7 +7,7 @@
     animation: spin 2s linear infinite;
 }
 
-.spinner__center {
+.spinner_center {
     position: absolute;
     top: 50%;
     left: 50%;

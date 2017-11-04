@@ -8,9 +8,7 @@ const b = b_.lock('spinner');
 
 export default function Spinner({position}) {
     return (
-        <div className={position
-            ? b.mix(`spinner__${position}`)
-            : b.mix()}
+        <div className={position ? b({[position]: true}) : b()}
         />
     );
 }

@@ -10,13 +10,12 @@
     flex-direction: column;
 }
 
-.message {
-    color: red;
-    text-align: center;
-    padding: 10px;
-}
-
-.auth-from {
+.auth-form {
     display: flex;
     flex-direction: row;
+}
+
+.auth__message {
+    padding: 10px;
+    color: red;
 }

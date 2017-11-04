@@ -4,29 +4,40 @@ import {
 } from '../constants/auth';
 
 const initialState = {
-    key: null,
-    token: null,
+    key: '',
+    token: '',
 };
 
-export default function user(state = initialState, action) {
-    switch (action.type) {
+export default function user(state = initialState, {type, payload}) {
+    switch (type) {
 
         case AUTH_SUCCESS:
+            const {
+                key,
+                token,
+                login,
+                isAuthenticated,
+            } = payload;
+
             return {...state,
-                key: action.payload.key,
-                token: action.payload.token,
-                login: action.payload.login,
-                isAuthenticated: action.payload.isAuthenticated,
+                key,
+                token,
+                login,
+                isAuthenticated,
                 error: {}
             };
 
         case AUTH_FAIL:
+            const {
+                error,
+                message,
+            } = payload;
+
             return {...state,
                 error: {
-                    code: action.payload.error,
-                    message: action.payload.message
-                },
-                isAuthenticated: action.payload.isAuthenticated
+                    code: error,
+                    message
+                }
             };
 
         default:
