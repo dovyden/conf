@@ -10,8 +10,10 @@ export default class DocumentView extends Component {
         }
 
         this.flagMouseDownForPaper = true;
+        // constrainDuringPan
         this.viewer.panVertical = false;
         this.viewer.panHorizontal = false;
+        this.viewer.gestureSettingsMouse.scrollToZoom = false;
         const x = event.pageX - this.left;
         const y = event.pageY - this.top;
         this.marks[this.countOfMarks] = {
@@ -25,7 +27,7 @@ export default class DocumentView extends Component {
         };
     }
 
-    onMouseDrag(event) {
+    onMouseDrag(event, delta) {
         if (this.flagMouseDownForPaper) {
             if (!event.ctrlKey) {
                 this.onMouseUp();
@@ -33,6 +35,18 @@ export default class DocumentView extends Component {
             const x = event.pageX - this.left;
             const y = event.pageY - this.top;
             this.marks[this.countOfMarks].path.add(x, y);
+        } else if (this.countOfMarks) {
+            /**
+             * TODO: when there is no pan because of the fact that the drawing gets on the screen,
+             * the marks should not move
+             */
+            // const newZoom = this.viewer.viewport.getZoom(true) /  this.marks[0].zoom;
+            // console.log(newZoom);
+            console.log(this.viewer.viewport.getZoom(true));
+            this.marks.forEach((item) => {
+                const deltaPath = new Point(delta.x, delta.y);
+                item.path.translate(deltaPath);
+            });
         }
     }
 
@@ -40,18 +54,12 @@ export default class DocumentView extends Component {
         if (this.flagMouseDownForPaper) {
             this.marks[this.countOfMarks].bound = this.viewer.viewport.getBounds(true);
             this.marks[this.countOfMarks].zoom = this.viewer.viewport.getZoom(true);
-            console.log("Path:");
-            console.log(this.marks[this.countOfMarks].path.bounds.topLeft);
-            console.log(this.marks[this.countOfMarks].path.bounds.topRight);
-            console.log(this.marks[this.countOfMarks].path.bounds.bottomRight);
-            console.log(this.marks[this.countOfMarks].path.bounds.bottomLeft);
-            console.log("OSD:");
-            console.log(this.viewer.viewport.getBounds(true));
             this.countOfMarks++;
         }
         this.flagMouseDownForPaper = false;
         this.viewer.panVertical = true;
         this.viewer.panHorizontal = true;
+        this.viewer.gestureSettingsMouse.scrollToZoom = true;
     }
 
     componentDidMount() {
@@ -73,54 +81,41 @@ export default class DocumentView extends Component {
             showNavigationControl: false,
             gestureSettingsMouse: {clickToZoom: false},
             showNavigator: false,
-            zoomPerScroll: 0.7,
+            zoomPerScroll: 0.5,
             debugMode: false,
-            visibilityRatio: 1.0,
+            visibilityRatio: 0.9,
+            minZoomLevel: 1,
             constrainDuringPan: true,
             tileSources: 'https://test.knevod.com/static/tile/_test/4H/4H@test.knevod.com/330/0/tiles.dzi'
         });
 
         this.viewer.addHandler('open', () => {
-            const oldBounds = this.viewer.viewport.getBounds();
+            const oldBounds = this.viewer.viewport.getBounds(true);
             const newBounds = new OpenSeadragon.Rect(0, 0, 1, oldBounds.height / oldBounds.width);
             this.viewer.viewport.fitBounds(newBounds, true); // нужное место на рисунке
             this.viewer.viewport.zoomTo(2); // нужный зум
         });
 
-        // this.viewer.addHandler('animation', (event) => {
-        //     console.log('animation');
-        // });
-        // this.viewer.addHandler('animation-start', (event) => {
-        //     console.log('animation-start');
-        // });
-        // this.viewer.addHandler('animation-finish', (event) => {
-        //     console.log('animation-finish');
-        // });
-        // this.viewer.addHandler('canvas-enter', (event) => {
-        //     console.log('canvas-enter');
-        // });
-        // this.viewer.addHandler('canvas-drag-end', (event) => {
-        //     this.onMouseUp();
-        // });
         this.viewer.addHandler('canvas-scroll', (event) => {
-            this.marks.forEach((item) => {
-                console.log('old zoom:', item.zoom);
-                const newZoom = item.zoom / this.viewer.viewport.getZoom(true);
-                console.log('new zoom:', newZoom);
-                console.log('osd zoom:', this.viewer.viewport.getZoom(true));
-                console.log(item.path.scaling.x, item.path.scaling.y);
-                // item.path.scale(newZoom);
-                item.path.scaling.x *= newZoom;
-                item.path.scaling.y *= newZoom;
-                console.log(item.path);
-            });
+
+            // if (this.marks[0].path === undefined || this.flagMouseDownForPaper) {
+            //     return;
+            // }
+            //
+            // this.marks.forEach((item) => {
+            //     const newZoom = this.viewer.viewport.getZoom(true) / item.zoom;
+            //     item.path.view.zoom = newZoom;
+            //     // item.path.scale(newZoom, new Point(item.path.handleBounds.center.x, item.path.handleBounds.center.y));
+            // });
         });
 
         this.viewer.addHandler('canvas-press', (event) => {
+            // event.preventDefaultAction = true
             this.onMouseDown(event.originalEvent);
         });
         this.viewer.addHandler('canvas-drag', (event) => {
-            this.onMouseDrag(event.originalEvent);
+            this.onMouseDrag(event.originalEvent, event.delta);
+
         });
         this.viewer.addHandler('canvas-exit', (event) => {
             this.onMouseUp();
@@ -128,6 +123,7 @@ export default class DocumentView extends Component {
         this.viewer.addHandler('canvas-release', (event) => {
             this.onMouseUp();
         });
+
     }
 
     render() {
