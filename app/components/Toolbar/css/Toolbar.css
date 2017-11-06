@@ -1,0 +1,36 @@
+.toolbar {
+    padding: 10px 30px;
+}
+
+.toolbar__item {
+    display: inline-block;
+    float: right;
+    margin: 0 15px;
+    width: 38px;
+    height: 38px;
+    line-height: 38px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.08);
+    border: solid 1px #d9d9d9;
+    border-radius: 19px;
+}
+
+.toolbar__item_active {
+    background-color: #6c8da7;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.toolbar__icon {
+     margin: 0 auto;
+     color: #c3c6cd;
+ }
+
+.toolbar__icon_active {
+    color: #ffffff;
+}
+
+.toolbar__content {
+    position: absolute;
+    top: 58px;
+    right: 0;
+}
