@@ -1,25 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import b_ from 'b_';
+
 import './Layout.css';
+
+const b = b_.lock('layout');
 
 const Tape = ({children, direction, size, type}) => {
     const styleProp = {
         flexBasis: size,
     };
 
-    if (direction) {
-        styleProp.flexDirection = direction;
-    }
-
-    if (size !== '0%') {
-        return (
-            <div className={type} style={styleProp}>
-                {children}
-            </div>
-        );
-    } else {
-        return null;
-    }
+    return (size !== '0%')
+        ? (<div className={direction ? b(type, {[direction]: true}) : b(type)} style={styleProp}>
+            {children}
+        </div>)
+        : null;
 };
 
 Tape.propTypes = {

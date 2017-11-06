@@ -1,13 +1,5 @@
 import {LAYOUT_CHANGE} from '../constants/layout';
 
-const initialState = {
-    stateId: 1,
-    direction: 'row',
-    tape: '100%',
-    cellOf1stTape: '100%',
-    cellOf2ndTape: '100%',
-};
-
 const initState = {
     root: {
         state: 1,
@@ -42,28 +34,37 @@ const initState = {
     }],
 };
 
-export default function layout(state = initState, action) {
-    switch (action.type) {
+export default function layout(state = initState, {type, payload}) {
+    switch (type) {
 
         case LAYOUT_CHANGE:
+            const {
+                stateId,
+                direction,
+                tape,
+                contentId,
+                cellOf1stTape,
+                cellOf2ndTape,
+            } = payload;
+
             return {...state,
                 root: {
-                    state: action.payload.stateId,
-                    direction: action.payload.direction,
+                    state: stateId,
+                    direction: direction,
                 },
-                tape: [action.payload.tape, `${100 - parseFloat(action.payload.tape)}%`],
+                tape: [tape, `${100 - parseFloat(tape)}%`],
                 cell: [{
-                    contentId: action.payload.contentId[0],
-                    flexBasis: action.payload.cellOf1stTape,
+                    contentId: contentId[0],
+                    flexBasis: cellOf1stTape,
                 }, {
-                    contentId: action.payload.contentId[1],
-                    flexBasis: `${100 - parseFloat(action.payload.cellOf1stTape)}%`,
+                    contentId: contentId[1],
+                    flexBasis: `${100 - parseFloat(cellOf1stTape)}%`,
                 }, {
-                    contentId: action.payload.contentId[2],
-                    flexBasis: action.payload.cellOf2ndTape
+                    contentId: contentId[2],
+                    flexBasis: cellOf2ndTape
                 }, {
-                    contentId: action.payload.contentId[3],
-                    flexBasis: `${100 - parseFloat(action.payload.cellOf2ndTape)}%`,
+                    contentId: contentId[3],
+                    flexBasis: `${100 - parseFloat(cellOf2ndTape)}%`,
                 }]
             };
 

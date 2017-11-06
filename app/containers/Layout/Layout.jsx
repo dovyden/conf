@@ -20,8 +20,11 @@ function unFocus(document, window) {
 class Layout extends Component {
     constructor(props) {
         super(props);
+
+        const {state} = this.props.layout.root;
+
         this.state = {
-            currentState: this.props.layout.root.state,
+            currentState: state,
             top: '0%',                      //4 splitters
             bottom: '100%',
             left: '0%',
@@ -100,17 +103,17 @@ class Layout extends Component {
 
     possibleDownTo2(e) {
         return (e.clientY - parseFloat(this.state.top) *
-                e.target.parentElement.clientHeight / 100 <
-                this.state.sizeOfBox) ? 'top' :
-                    (parseFloat(this.state.bottom) *
-                    e.target.parentElement.clientHeight / 100 - e.clientY <
-                    this.state.sizeOfBox) ? 'bottom' : '';
+            e.target.parentElement.clientHeight / 100 <
+            this.state.sizeOfBox) ? 'top' :
+            (parseFloat(this.state.bottom) *
+                e.target.parentElement.clientHeight / 100 - e.clientY <
+                this.state.sizeOfBox) ? 'bottom' : '';
     }
 
     downTo2(e, types) {
         const opposite = (types === 'left top') ? 'right bottom' :
             (types === 'right bottom') ? 'left top' :
-            (types === 'left bottom') ? 'right top' : 'left bottom';
+                (types === 'left bottom') ? 'right top' : 'left bottom';
         const arr = types.split(' ');
 
         this.setState({
@@ -123,20 +126,20 @@ class Layout extends Component {
             parentHeight: e.target.parentElement.clientHeight,
             parentWidth: e.target.parentElement.clientWidth,
             offsetX: e.clientX - parseFloat(this.state[arr[0]]) *
-                e.target.parentElement.clientWidth / 100,
+            e.target.parentElement.clientWidth / 100,
             offsetY: e.clientY - parseFloat(this.state[arr[1]]) *
-                e.target.parentElement.clientHeight / 100,
+            e.target.parentElement.clientHeight / 100,
         });
     }
     downTo3(e, type) {
         const opposite = (type === 'top') ? 'bottom' :
             (type === 'bottom') ? 'top' :
-            (type === 'left') ? 'right' : 'left';
+                (type === 'left') ? 'right' : 'left';
         const arr = (type === 'left' || type === 'right') ?
             [e.clientX - parseFloat(this.state[type]) *
-                e.target.parentElement.clientWidth / 100, 0] :
+            e.target.parentElement.clientWidth / 100, 0] :
             [0, e.clientY - parseFloat(this.state[type]) *
-                e.target.parentElement.clientHeight / 100];
+            e.target.parentElement.clientHeight / 100];
 
         this.setState({
             ...this.state,
@@ -159,10 +162,10 @@ class Layout extends Component {
 
         this.setState({
             ...this.state,
-            [arr[0]]: `${(e.clientX - this.state.offsetX) / 
-                this.state.parentWidth * 100}%`,
+            [arr[0]]: `${(e.clientX - this.state.offsetX) /
+            this.state.parentWidth * 100}%`,
             [arr[1]]: `${(e.clientY - this.state.offsetY) /
-                this.state.parentHeight * 100}%`,
+            this.state.parentHeight * 100}%`,
         });
     }
     move3(e) {
@@ -185,22 +188,22 @@ class Layout extends Component {
 
             if (this.possibleUpTo2(e, 2)) {
                 this.upTo2(this.state.draggingSplitters,
-                    `${(parseFloat(this.state[arr[0]]) + this.state.offsetX / 
+                    `${(parseFloat(this.state[arr[0]]) + this.state.offsetX /
                         this.state.parentWidth * 100)}%`,
-                    `${(parseFloat(this.state[arr[1]]) + this.state.offsetY / 
+                    `${(parseFloat(this.state[arr[1]]) + this.state.offsetY /
                         this.state.parentHeight * 100)}%`);
             } else {
                 const args = (e.clientY < this.state.minSizeOfCell ||
                     e.clientY > this.state.parentHeight -
                     this.state.minSizeOfCell) ? {
-                        type: arr[0],
-                        distance: `${(e.clientX - this.state.offsetX) /
-                            this.state.parentWidth * 100}%`,
-                    } : {
-                        type: arr[1],
-                        distance: `${(e.clientY - this.state.offsetY) / 
-                            this.state.parentHeight * 100}%`,
-                    }
+                    type: arr[0],
+                    distance: `${(e.clientX - this.state.offsetX) /
+                    this.state.parentWidth * 100}%`,
+                } : {
+                    type: arr[1],
+                    distance: `${(e.clientY - this.state.offsetY) /
+                    this.state.parentHeight * 100}%`,
+                }
 
                 this.upTo3(args.type, args.distance);
             }
@@ -245,11 +248,11 @@ class Layout extends Component {
         switch (previousState) {
             case 2:
                 return (e.clientY > this.state.minSizeOfCell &&
-                        e.clientX > this.state.minSizeOfCell &&
-                        e.clientY < this.state.parentHeight -
-                                    this.state.minSizeOfCell &&
-                        e.clientX < this.state.parentWidth -
-                                    this.state.minSizeOfCell)
+                    e.clientX > this.state.minSizeOfCell &&
+                    e.clientY < this.state.parentHeight -
+                    this.state.minSizeOfCell &&
+                    e.clientX < this.state.parentWidth -
+                    this.state.minSizeOfCell)
         }
     }
 
@@ -279,7 +282,7 @@ class Layout extends Component {
     upTo2(types, size, sizeOfCell) {
         const opposite = (types === 'left top') ? 'right bottom' :
             (types === 'right bottom') ? 'left top' :
-            (types === 'left bottom') ? 'right top' : 'left bottom';
+                (types === 'left bottom') ? 'right top' : 'left bottom';
 
         this.setState({
             ...this.state,
@@ -302,7 +305,7 @@ class Layout extends Component {
         const direction = type === ('top' || 'bottom') ? 'column' : 'row';
         const opposite = (type === 'top') ? 'bottom' :
             (type === 'bottom') ? 'top' :
-            (type === 'left') ? 'right' : 'left';
+                (type === 'left') ? 'right' : 'left';
 
         let splitters = {
             top: '0%',
@@ -373,60 +376,62 @@ class Layout extends Component {
     }
 
     render() {
+        const {
+            top,
+            bottom,
+            left,
+            right,
+            hiddenSplitters,
+        } = this.state;
+
+        const {
+            tape,
+            cell,
+        } = this.props.layout;
+
+        const {direction} = this.props.layout.root;
+
         return (
             <LayoutComponent
-                direction={this.props.layout.root.direction}
+                direction={direction}
                 mousedown={this.mouseDownLine.bind(this)}
             >
                 <Splitter
                     type={'top'}
-                    position={this.state.top}
-                    display = {this.state.hiddenSplitters}
+                    position={top}
+                    display = {hiddenSplitters}
                 />
                 <Splitter
                     type={'bottom'}
-                    position={this.state.bottom}
-                    display = {this.state.hiddenSplitters}
+                    position={bottom}
+                    display = {hiddenSplitters}
                 />
                 <Splitter
                     type={'left'}
-                    position={this.state.left}
-                    display = {this.state.hiddenSplitters}
+                    position={left}
+                    display = {hiddenSplitters}
                 />
                 <Splitter
                     type={'right'}
-                    position={this.state.right}
-                    display = {this.state.hiddenSplitters}
+                    position={right}
+                    display = {hiddenSplitters}
                 />
                 <Tape
                     type={'tape'}
-                    direction={(this.props.layout.root.direction === 'row') ?
-                        'column' : 'row'}
-                    size={this.props.layout.tape[0]}
+                    direction={(direction === 'row') ? 'column' : 'row'}
+                    size={tape[0]}
                 >
-                    <Tape
-                        type={'cell'}
-                        size={this.props.layout.cell[0].flexBasis}
-                    >{this.props.layout.cell[0].contentId}</Tape>
-                    <Tape
-                        type={'cell'}
-                        size={this.props.layout.cell[1].flexBasis}
-                    >{this.props.layout.cell[1].contentId}</Tape>
+                    <Tape type={'cell'} size={cell[0].flexBasis}>{cell[0].contentId}</Tape>
+                    <Tape type={'cell'} size={cell[1].flexBasis}>{cell[1].contentId}</Tape>
                 </Tape>
+
                 <Tape
                     type={'tape'}
-                    direction={(this.props.layout.root.direction === 'row') ?
-                        'column' : 'row'}
-                    size={this.props.layout.tape[1]}
+                    direction={(direction === 'row') ? 'column' : 'row'}
+                    size={tape[1]}
                 >
-                    <Tape
-                        type={'cell'}
-                        size={this.props.layout.cell[2].flexBasis}
-                    >{this.props.layout.cell[2].contentId}</Tape>
-                    <Tape
-                        type={'cell'}
-                        size={this.props.layout.cell[3].flexBasis}
-                    >{this.props.layout.cell[3].contentId}</Tape>
+                    <Tape type={'cell'} size={cell[2].flexBasis}>{cell[2].contentId}</Tape>
+                    <Tape type={'cell'} size={cell[3].flexBasis}>{cell[3].contentId}</Tape>
                 </Tape>
             </LayoutComponent>
         );
