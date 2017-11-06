@@ -9,14 +9,11 @@ export default class DocumentView extends Component {
         }
 
         this.flagMouseDownForPaper = true;
-        // constrainDuringPan
         this.viewer.panVertical = false;
         this.viewer.panHorizontal = false;
         this.viewer.zoomPerScroll = 1; // forbid zoom
         const x = event.position.x;
         const y = event.position.y;
-        // const x = event.pageX - this.left;
-        // const y = event.pageY - this.top;
         this.marks[this.countOfMarks] = {
             path: new Path({
                 segments: [new Point(x, y)],
@@ -29,17 +26,21 @@ export default class DocumentView extends Component {
         };
     }
 
-    onMouseDrag(event, delta, x, y) {
+    onMouseDrag(event) {
         if (this.flagMouseDownForPaper) {
-            if (!event.ctrlKey) {
+            if (!event.originalEvent.ctrlKey) {
                 this.onMouseUp();
             }
+            const x = event.position.x;
+            const y = event.position.y;
             this.marks[this.countOfMarks].path.add(new Point(x, y));
         } else if (this.countOfMarks) {
             /**
              * TODO: when there is no pan because of the fact that the drawing gets on the screen,
              * the marks should not move
              */
+            // TODO: do only one translate when drag is over(optimization)
+            const delta = event.delta;
             const currentZoom = this.viewer.viewport.getZoom(true);
             this.marks.forEach((item) => {
                 const newZoom = currentZoom / item.currentZoom;
@@ -87,8 +88,8 @@ export default class DocumentView extends Component {
             zoomPerScroll: 0.75,
             debugMode: false,
             visibilityRatio: 0.9,
-            minZoomLevel: 1,
-            maxZoomLevel: 6,
+            // minZoomLevel: 1,
+            // maxZoomLevel: 6,
             constrainDuringPan: true,
             tileSources: 'https://test.knevod.com/static/tile/_test/4H/4H@test.knevod.com/330/0/tiles.dzi'
         });
@@ -111,15 +112,21 @@ export default class DocumentView extends Component {
                 return;
             }
 
-            // const newBounds = this.viewer.viewport.deltaPixelsFromPoints(this.viewer.viewport.getBounds(true));
-            // const delta = new Point(newBounds.x - this.prevBounds.x, newBounds.y - this.prevBounds.y);
+            const newCenter = this.viewer.viewport.deltaPixelsFromPointsNoRotate(event.refPoint, true);
+            const oldCenter = this.viewer.viewport.deltaPixelsFromPointsNoRotate(this.viewer.viewport.getCenter(true), true);
+            const delta = new Point(oldCenter.x - newCenter.x, oldCenter.y - newCenter.y);
             this.marks.forEach((item) => {
                 const newZoom = currentZoom / item.currentZoom;
-                // delta.x /= newZoom;
-                // delta.y /= newZoom;
-                // item.path.translate(new Point(10, 10));
-                item.currentZoom = currentZoom;
                 item.path.scale(newZoom);
+                const sign = currentZoom > item.currentZoom ? 1 : -1;
+                delta.x *= sign;
+                delta.y *= sign;
+                const interchangeableZoom = sign === 1 ? currentZoom : item.currentZoom;
+                delta.x /= interchangeableZoom;
+                delta.y /= interchangeableZoom;
+                console.log(delta.x, delta.y);
+                item.path.translate(delta);
+                item.currentZoom = currentZoom;
             });
         });
 
@@ -127,16 +134,15 @@ export default class DocumentView extends Component {
             this.onMouseDown(event);
         });
         this.viewer.addHandler('canvas-drag', (event) => {
-            this.onMouseDrag(event.originalEvent, event.delta, event.position.x, event.position.y);
+            this.onMouseDrag(event);
 
         });
-        this.viewer.addHandler('canvas-exit', (event) => {
+        this.viewer.addHandler('canvas-exit', () => {
             this.onMouseUp();
         });
-        this.viewer.addHandler('canvas-release', (event) => {
+        this.viewer.addHandler('canvas-release', () => {
             this.onMouseUp();
         });
-
     }
 
     render() {
