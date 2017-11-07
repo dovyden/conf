@@ -1,0 +1,26 @@
+.box{
+    position:fixed;
+    z-index:2;
+}
+.boxWithText{
+    border-radius: 5px;
+    height: 200px;
+    width: 200px;
+}
+.poligon{
+    position: absolute;
+    vertical-align:bottom;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+.elem{
+}
+.elem:visited {
+    color: blue; /* Цвет посещенной ссылки */
+}
+.test{
+    width:200px;
+    height:200px;
+}
