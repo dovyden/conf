@@ -1,33 +1,26 @@
-import {NODE_DOWNLOADED} from '../constants/navigator';
+import {STORE_NODES, NODE_ATTRS_TO_DESERIALIZE, DEFAULT_NODE_ATTRS} from '../constants/navigator';
 
 import {fetchApi} from '../utils/fetch';
 
 const deserialize = (json) => {
     const nodes = json.nodes;
     const result = {};
-    for (const key1 in nodes) {
-        if (!nodes.hasOwnProperty(key1)) {
-            continue;
-        }
+    for (const nodeId in nodes) {
         const node = {};
-        for (const key2 in nodes[key1]) {
-            if (!nodes[key1].hasOwnProperty(key2)) {
-                continue;
-            }
-            try {
-                node[key2] = JSON.parse(nodes[key1][key2]);
-            } catch (SyntaxError) {
-                node[key2] = nodes[key1][key2];
+        for (const propId in nodes[nodeId]) {
+            if (NODE_ATTRS_TO_DESERIALIZE.includes(propId)) {
+                node[propId] = JSON.parse(nodes[nodeId][propId]);
+            } else {
+                node[propId] = nodes[nodeId][propId];
             }
         }
-        result[key1] = node;
+        result[nodeId] = node;
     }
     return result;
 };
 
-export const fetchNodes = (params) => {
+export const fetchNodes = (query, attrs = DEFAULT_NODE_ATTRS) => {
     return (dispatch) => {
-        const {query, attrs} = params;
         fetchApi('node/SEARCH', {body: {
             query,
             attrs
@@ -37,7 +30,7 @@ export const fetchNodes = (params) => {
             (json) => {
                 const data = deserialize(json);
                 dispatch({
-                    type: NODE_DOWNLOADED,
+                    type: STORE_NODES,
                     payload: data
                 });
             }
