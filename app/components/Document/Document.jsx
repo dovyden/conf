@@ -44,8 +44,10 @@ export default class DocumentView extends Component {
             const currentZoom = this.viewer.viewport.getZoom(true);
             this.marks.forEach((item) => {
                 const newZoom = currentZoom / item.currentZoom;
-                const deltaPath = new Point(delta.x / newZoom, delta.y / newZoom);
-                item.path.translate(deltaPath);
+                const interchangeableZoom = currentZoom > item.currentZoom ? currentZoom : item.currentZoom;
+                delta.x /= interchangeableZoom;
+                delta.y /= interchangeableZoom;
+                item.path.translate(new Point(delta.x, delta.y));
             });
         }
     }
@@ -112,20 +114,23 @@ export default class DocumentView extends Component {
                 return;
             }
 
+            // const oldCenter = this.viewer.viewport.getCenter(true);
+            // const deltaPoints = new OpenSeadragon.Point(oldCenter.x - event.refPoint.x, oldCenter.y - event.refPoint.y);
+            // const deltaPixels = this.viewer.viewport.deltaPixelsFromPointsNoRotate(deltaPoints);
+            // const delta = new Point(deltaPixels.x, deltaPixels.y);
             const newCenter = this.viewer.viewport.deltaPixelsFromPointsNoRotate(event.refPoint, true);
             const oldCenter = this.viewer.viewport.deltaPixelsFromPointsNoRotate(this.viewer.viewport.getCenter(true), true);
             const delta = new Point(oldCenter.x - newCenter.x, oldCenter.y - newCenter.y);
             this.marks.forEach((item) => {
                 const newZoom = currentZoom / item.currentZoom;
-                item.path.scale(newZoom);
                 const sign = currentZoom > item.currentZoom ? 1 : -1;
                 delta.x *= sign;
                 delta.y *= sign;
                 const interchangeableZoom = sign === 1 ? currentZoom : item.currentZoom;
                 delta.x /= interchangeableZoom;
                 delta.y /= interchangeableZoom;
-                console.log(delta.x, delta.y);
                 item.path.translate(delta);
+                item.path.scale(newZoom);
                 item.currentZoom = currentZoom;
             });
         });
