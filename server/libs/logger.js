@@ -1,7 +1,7 @@
 'use strict';
 
 const dominoLogger = require('domino-logger');
-const appLogger = dominoLogger('application');
+const appLogger = dominoLogger('app');
 
 
 module.exports = function loggerFactory(options) {
