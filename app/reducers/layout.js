@@ -5,31 +5,31 @@ const initState = {
         state: 1,
         direction: 'row',
     },
-    tape: ['100%','0%'],        // flexBasis for 1st tape, 2nd tape
+    tape: [100, 0],         // flexBasis for 1st tape, 2nd tape
     cell: [{
         contentId: 0,
-        flexBasis: '100%'
+        flexBasis: 100      // 1st cell of 1st tape
     }, {
-        contentId: 1,
-        flexBasis: '0%'
+        contentId: null,
+        flexBasis: 0        // 2st cell of 1st tape
     }, {
-        contentId: 2,
-        flexBasis: '0%'
+        contentId: null,
+        flexBasis: 0        // 1st cell of 2st tape
     }, {
-        contentId: 3,
-        flexBasis: '0%'
+        contentId: null,
+        flexBasis: 0        // 2st cell of 2st tape
     }],
     content: [{
         type: 'navigator',
         id: null,
     }, {
-        type: 'document',
+        type: 'empty1',
         id: null,
     }, {
-        type: 'navigator',
+        type: 'empty2',
         id: null,
     }, {
-        type: 'navigator',
+        type: 'empty3',
         id: null,
     }],
 };
@@ -52,19 +52,19 @@ export default function layout(state = initState, {type, payload}) {
                     state: stateId,
                     direction: direction,
                 },
-                tape: [tape, `${100 - parseFloat(tape)}%`],
+                tape: [tape, 100 - tape],
                 cell: [{
                     contentId: contentId[0],
                     flexBasis: cellOf1stTape,
                 }, {
                     contentId: contentId[1],
-                    flexBasis: `${100 - parseFloat(cellOf1stTape)}%`,
+                    flexBasis: 100 - action.payload.cellOf1stTape,
                 }, {
                     contentId: contentId[2],
                     flexBasis: cellOf2ndTape
                 }, {
                     contentId: contentId[3],
-                    flexBasis: `${100 - parseFloat(cellOf2ndTape)}%`,
+                    flexBasis: 100 - cellOf2ndTape,
                 }]
             };
 
