@@ -1,12 +1,14 @@
 import {
     applyMiddleware,
     combineReducers,
-    createStore,
+    createStore
 } from 'redux';
-import thunk from 'redux-thunk';
 import {
     createLogger as logger
 } from 'redux-logger';
+import thunk from 'redux-thunk';
+
+import {load} from './localStorage';
 import reducers from '../reducers';
 
 // add middlewares to redux store
@@ -20,9 +22,11 @@ if (process.env.NODE_ENV === 'development') {
     }));
 }
 
+// restore state-store from localStorage
+const persistedState = load('auth');
 // create store
 export default createStore(
     combineReducers(reducers),
-    {},  // initial store
+    persistedState,  // initial store
     applyMiddleware(...middlewares)
 );
