@@ -120,10 +120,10 @@ class Layout extends Component {
     }
 
     possibleDownTo2(e) {
-        return (e.clientY - this.state.top * e.target.parentElement.clientHeight
-            / 100 < this.state.sizeOfBox) ? 'top' :
-            (this.state.bottom * e.target.parentElement.clientHeight / 100
-                - e.clientY < this.state.sizeOfBox) ? 'bottom' : '';
+        return (Math.abs(e.clientY - this.state.top * e.target.parentElement.clientHeight
+            / 100) < this.state.sizeOfBox) ? 'top' :
+            (Math.abs(this.state.bottom * e.target.parentElement.clientHeight / 100
+                - e.clientY) < this.state.sizeOfBox) ? 'bottom' : '';
     }
 
     possibleDownTo4(e) {
@@ -453,7 +453,6 @@ class Layout extends Component {
                     break;
                 case 3:
                     this.up3(e);
-                    console.log(this.state.contentId);
                     break;
                 case 4:
                     this.up4(e);
@@ -508,8 +507,7 @@ class Layout extends Component {
                 />
                 <Tape
                     type={'tape'}
-                    direction={(direction === 'row') ?
-                        'column' : 'row'}
+                    direction={(direction === 'row') ? 'column' : 'row'}
                     size={`${tape[0]}%`}
                 >
                     <Tape
@@ -524,8 +522,7 @@ class Layout extends Component {
 
                 <Tape
                     type={'tape'}
-                    direction={(direction === 'row') ?
-                        'column' : 'row'}
+                    direction={(direction === 'row') ? 'column' : 'row'}
                     size={`${tape[1]}%`}
                 >
                     <Tape

@@ -58,7 +58,7 @@ export default function layout(state = initState, {type, payload}) {
                     flexBasis: cellOf1stTape,
                 }, {
                     contentId: contentId[1],
-                    flexBasis: 100 - action.payload.cellOf1stTape,
+                    flexBasis: 100 - cellOf1stTape,
                 }, {
                     contentId: contentId[2],
                     flexBasis: cellOf2ndTape
