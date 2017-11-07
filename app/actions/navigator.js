@@ -28,10 +28,9 @@ export const fetchNodes = (query, attrs = DEFAULT_NODE_ATTRS) => {
             return res.json();
         }).then(
             (json) => {
-                const data = deserialize(json);
                 dispatch({
                     type: STORE_NODES,
-                    payload: data
+                    payload: deserialize(json)
                 });
             }
         );
