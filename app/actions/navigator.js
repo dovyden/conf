@@ -19,9 +19,10 @@ const deserialize = (json) => {
     return result;
 };
 
-export const fetchNodes = (query, attrs = DEFAULT_NODE_ATTRS) => {
+export const fetchNodes = ({nodes, query, attrs = DEFAULT_NODE_ATTRS}) => {
     return (dispatch) => {
         fetchApi('node/SEARCH', {body: {
+            nodes,
             query,
             attrs
         }}).then(res => {
