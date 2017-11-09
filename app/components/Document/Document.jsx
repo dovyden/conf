@@ -3,8 +3,80 @@ import * as OpenSeadragon from 'openseadragon';
 import {Path, paper, Point} from 'paper';
 import PropTypes from 'prop-types';
 // OSD назвать по Бэму
-// забиндить обработчика
 export default class DocumentView extends Component {
+    componentDidMount() {
+        const idMarks = `paperCanvas${this.props.idDocument.toString()}`;
+        paper.setup(idMarks);
+
+        const targetElement = document.getElementById(idMarks);
+        this.left = targetElement.getBoundingClientRect().left;
+        this.top = targetElement.getBoundingClientRect().top;
+
+        this.marks = new Array({});
+        this.countOfMarks = 0;
+
+        this.flagMouseDownForPaper = false;
+
+        const idDocument = this.props.idDocument.toString();
+        // TODO: slow raise events to faster redraw marks
+        this.viewer = new OpenSeadragon.Viewer({
+            id: idDocument,
+            showNavigationControl: false,
+            gestureSettingsMouse: {clickToZoom: false},
+            showNavigator: false,
+            zoomPerScroll: 0.75,
+            debugMode: false,
+            visibilityRatio: 0.9,
+            // minZoomLevel: 1,
+            // maxZoomLevel: 6,
+            constrainDuringPan: true,
+            tileSources: 'https://test.knevod.com/static/tile/_test/4H/4H@test.knevod.com/330/0/tiles.dzi'
+        });
+
+        this.onMouseUp = this.onMouseUp.bind(this);
+        this.onOpen = this.onOpen.bind(this);
+
+        this.viewer.addHandler('open', this.onOpen);
+        this.viewer.addHandler('canvas-exit', this.onMouseUp);
+        this.viewer.addHandler('canvas-release', this.onMouseUp);
+
+        this.viewer.addHandler('zoom', (event) => {
+            if (!this.countOfMarks || this.flagMouseDownForPaper) {
+                return;
+            }
+
+            const currentZoom = event.zoom;
+            if (currentZoom >= 6 || currentZoom <= 1) {
+                return;
+            }
+
+            const newCenter = this.viewer.viewport.deltaPixelsFromPointsNoRotate(event.refPoint, true);
+            const oldCenter = this.viewer.viewport.deltaPixelsFromPointsNoRotate(
+                this.viewer.viewport.getCenter(true), true);
+            const delta = new Point(oldCenter.x - newCenter.x, oldCenter.y - newCenter.y);
+            // const delta = new Point(oldCenter.x / this.marks[0].currentZoom - newCenter.x / currentZoom,
+            //     oldCenter.y / this.marks[0].currentZoom - newCenter.y / currentZoom);
+            this.marks.forEach((item) => {
+                const newZoom = currentZoom / item.currentZoom;
+                const sign = currentZoom > item.currentZoom ? 1 : -1;
+                delta.x *= sign;
+                delta.y *= sign;
+                // const interchangeableZoom = sign === 1 ? currentZoom : item.currentZoom;
+                // delta.x /= interchangeableZoom;
+                // delta.y /= interchangeableZoom;
+                item.path.translate(delta);
+                item.path.scale(newZoom);
+                item.currentZoom = currentZoom;
+            });
+        });
+        this.viewer.addHandler('canvas-press', (event) => {
+            this.onMouseDown(event);
+        });
+        this.viewer.addHandler('canvas-drag', (event) => {
+            this.onMouseDrag(event);
+        });
+    }
+
     onMouseDown(event) {
         if (!event.originalEvent.ctrlKey) {
             return;
@@ -69,84 +141,12 @@ export default class DocumentView extends Component {
         this.viewer.zoomPerScroll = 0.75; // allow zoom
     }
 
-    componentDidMount() {
-        const idMarks = `paperCanvas${this.props.idDocument.toString()}`;
-        paper.setup(idMarks);
-
-        const targetElement = document.getElementById(idMarks);
-        this.left = targetElement.getBoundingClientRect().left;
-        this.top = targetElement.getBoundingClientRect().top;
-
-        this.marks = new Array({});
-        this.countOfMarks = 0;
-
-        this.flagMouseDownForPaper = false;
-
-        const idDocument = this.props.idDocument.toString();
-        // TODO: slow raise events to faster redraw marks
-        this.viewer = new OpenSeadragon.Viewer({
-            id: idDocument,
-            showNavigationControl: false,
-            gestureSettingsMouse: {clickToZoom: false},
-            showNavigator: false,
-            zoomPerScroll: 0.75,
-            debugMode: false,
-            visibilityRatio: 0.9,
-            // minZoomLevel: 1,
-            // maxZoomLevel: 6,
-            constrainDuringPan: true,
-            tileSources: 'https://test.knevod.com/static/tile/_test/4H/4H@test.knevod.com/330/0/tiles.dzi'
-        });
-
-        this.viewer.addHandler('open', () => {
-            const oldBounds = this.viewer.viewport.getBounds(true);
-            const newBounds = new OpenSeadragon.Rect(0, 0, 1, oldBounds.height / oldBounds.width);
-            this.viewer.viewport.fitBounds(newBounds, true);
-            this.viewer.viewport.zoomTo(1, true);
-            // TODO: method who redraw marks with newBounds and zoom
-        });
-
-        this.viewer.addHandler('zoom', (event) => {
-            if (!this.countOfMarks || this.flagMouseDownForPaper) {
-                return;
-            }
-
-            const currentZoom = event.zoom;
-            if (currentZoom >= 6 || currentZoom <= 1) {
-                return;
-            }
-            const newCenter = this.viewer.viewport.deltaPixelsFromPointsNoRotate(event.refPoint, true);
-            const oldCenter = this.viewer.viewport.deltaPixelsFromPointsNoRotate(
-                this.viewer.viewport.getCenter(true), true);
-            const delta = new Point(oldCenter.x - newCenter.x, oldCenter.y - newCenter.y);
-            this.marks.forEach((item) => {
-                const newZoom = currentZoom / item.currentZoom;
-                const sign = currentZoom > item.currentZoom ? 1 : -1;
-                delta.x *= sign;
-                delta.y *= sign;
-                const interchangeableZoom = sign === 1 ? currentZoom : item.currentZoom;
-                delta.x /= interchangeableZoom;
-                delta.y /= interchangeableZoom;
-                item.path.translate(delta);
-                item.path.scale(newZoom);
-                item.currentZoom = currentZoom;
-            });
-        });
-
-        this.viewer.addHandler('canvas-press', (event) => {
-            this.onMouseDown(event);
-        });
-        this.viewer.addHandler('canvas-drag', (event) => {
-            this.onMouseDrag(event);
-
-        });
-        this.viewer.addHandler('canvas-exit', () => {
-            this.onMouseUp();
-        });
-        this.viewer.addHandler('canvas-release', () => {
-            this.onMouseUp();
-        });
-
+    onOpen() {
+        const oldBounds = this.viewer.viewport.getBounds(true);
+        const newBounds = new OpenSeadragon.Rect(0, 0, 1, oldBounds.height / oldBounds.width);
+        this.viewer.viewport.fitBounds(newBounds, true);
+        this.viewer.viewport.zoomTo(1, true);
+        // TODO: method who redraw marks with newBounds and zoom
     }
 
     render() {

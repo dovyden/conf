@@ -65,8 +65,7 @@
     "build": "node tools/build.js",
     "lint": "npm run lint:js",
     "lint:css": "./node_modules/.bin/stylelint app/**/*.css",
-    "lint:js": "./node_modules/.bin/eslint --ext .js --ext .jsx app/ tools/",
-    "lint-fix:js": "./node_modules/.bin/eslint --fix --ext .js --ext .jsx app/ tools/",
+    "lint:js": "./node_modules/.bin/eslint --ext .js --ext .jsx app/ tools/ --fix",
     "ncu": "./node_modules/.bin/ncu --packageFile ./package.json",
     "start": "node tools/start.js",
     "test": "jest --env=jsdom --config=.jest.config.json",
@@ -76,7 +75,6 @@
     "node": ">=8.7"
   },
   "pre-commit": [
-    "lint",
-    "test"
+    "lint"
   ]
 }
