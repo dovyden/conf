@@ -9,28 +9,35 @@ const b = b_.lock('nodes-list');
 
 export default function NodesList(props) {
     return (
-        <div>
-            <div className={b('col-names')}>
-                <span className={b('text', {'col-name': true})}>
-                    Название
-                </span>
-                <span className={b('text', {'col-name': true})}>
-                    Автор
-                </span>
-            </div>
-            {Object.keys(props.nodes).map((nodeId) => {
-                return (
-                    <div key={nodeId}>
-                        <Node
-                            nodeId={nodeId}
-                            node={props.nodes[nodeId]}
-                            navigateTo={props.navigateTo}
-                        />
-                        <div className={b('line')}/>
-                    </div>
-                );
-            })}
-        </div>
+        <table className={b()}>
+            <thead>
+                <tr className={b('col-names')}>
+                    <th className={b('text', {'col-name': true})}>
+                        Название
+                    </th>
+                    <th className={b('text', {'col-name': true})}>
+                        Автор
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {Object.keys(props.nodes).map((nodeId) => {
+                    return (
+                        <tr
+                            key={nodeId}
+                            className={b('node')}
+                            onClick={() => {
+                                props.navigateTo({type: 'node', nodeId});
+                            }}
+                        >
+                            <Node
+                                node={props.nodes[nodeId]}
+                            />
+                        </tr>
+                    );
+                })}
+            </tbody>
+        </table>
     );
 }
 
