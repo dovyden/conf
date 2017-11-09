@@ -12,8 +12,7 @@ export default function Spinner({position, className}) {
     // We call the spinner-component either with a `position` prop or with a `className` prop or both. No other way.
     // In the future, there may be other modifiers
     return (
-        <div className={b.mix(className, {position})}
-        />
+        <div className={b.mix(className, {position})} />
     );
 }
 
