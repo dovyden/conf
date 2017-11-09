@@ -29,5 +29,13 @@ module.exports = {
     websockets: {
         path: '/ws',
         transports: ['polling', 'websocket']
+    },
+
+    voxEngine: {
+        userName: 'user1',
+        userPass: 'foruser1',
+        appName: 'ingipro-practice',
+        accountName: 'dovyden',
+        accountPass: 'bYY-xm4-Ts4-HFH'
     }
 };

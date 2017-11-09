@@ -12,7 +12,7 @@ module.exports = (server) => {
         socket
             .on('message', ({type, payload}) => {
                 try {
-                    return require(`case/${type}`)(payload);
+                    return require(`case/${type}`)(payload, socket);
                 } catch (ex) {
                     return require('case/default')(payload);
                 }
