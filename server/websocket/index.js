@@ -11,14 +11,10 @@ module.exports = (server) => {
 
         socket
             .on('message', ({type, payload}) => {
-
-                switch (type) {
-                    case 'example':
-                        require('./case/example')(payload);
-                        break;
-
-                    default:
-                        require('./case/default')(payload);
+                try {
+                    return require(`case/${type}`)(payload);
+                } catch (ex) {
+                    return require('case/default')(payload);
                 }
             })
 
