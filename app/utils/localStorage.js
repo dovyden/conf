@@ -10,13 +10,9 @@ export function save(type, payload) {
 
 export function load(type, defaultValue = {}) {
     try {
-        const serializedState = JSON.parse(localStorage.getItem(type));
-
-        return serializedState ? {
-            [type]: serializedState
-
-        } : defaultValue;
+        const item = localStorage.getItem(type);
+        return JSON.parse(item);
     } catch (err) {
-        return false;
+        return defaultValue;
     }
 }

@@ -23,7 +23,10 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // restore state-store from localStorage
-const persistedState = load('auth');
+const persistedState = {
+    auth: load('auth')
+};
+
 // create store
 export default createStore(
     combineReducers(reducers),
