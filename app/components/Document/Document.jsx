@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import * as OpenSeadragon from 'openseadragon';
 import {Path, paper, Point} from 'paper';
-
+import PropTypes from 'prop-types';
+// OSD назвать по Бэму
+// забиндить обработчика
 export default class DocumentView extends Component {
     onMouseDown(event) {
         if (!event.originalEvent.ctrlKey) {
@@ -41,12 +43,12 @@ export default class DocumentView extends Component {
              */
             // TODO: do only one translate when drag is over(optimization)
             const delta = event.delta;
-            const currentZoom = this.viewer.viewport.getZoom(true);
+            // const currentZoom = this.viewer.viewport.getZoom(true);
             this.marks.forEach((item) => {
-                const newZoom = currentZoom / item.currentZoom;
-                const interchangeableZoom = currentZoom > item.currentZoom ? currentZoom : item.currentZoom;
-                delta.x /= interchangeableZoom;
-                delta.y /= interchangeableZoom;
+                // const newZoom = currentZoom / item.currentZoom;
+                // const interchangeableZoom = currentZoom > item.currentZoom ? currentZoom : item.currentZoom;
+                // delta.x /= interchangeableZoom;
+                // delta.y /= interchangeableZoom;
                 item.path.translate(new Point(delta.x, delta.y));
             });
         }
@@ -113,13 +115,9 @@ export default class DocumentView extends Component {
             if (currentZoom >= 6 || currentZoom <= 1) {
                 return;
             }
-
-            // const oldCenter = this.viewer.viewport.getCenter(true);
-            // const deltaPoints = new OpenSeadragon.Point(oldCenter.x - event.refPoint.x, oldCenter.y - event.refPoint.y);
-            // const deltaPixels = this.viewer.viewport.deltaPixelsFromPointsNoRotate(deltaPoints);
-            // const delta = new Point(deltaPixels.x, deltaPixels.y);
             const newCenter = this.viewer.viewport.deltaPixelsFromPointsNoRotate(event.refPoint, true);
-            const oldCenter = this.viewer.viewport.deltaPixelsFromPointsNoRotate(this.viewer.viewport.getCenter(true), true);
+            const oldCenter = this.viewer.viewport.deltaPixelsFromPointsNoRotate(
+                this.viewer.viewport.getCenter(true), true);
             const delta = new Point(oldCenter.x - newCenter.x, oldCenter.y - newCenter.y);
             this.marks.forEach((item) => {
                 const newZoom = currentZoom / item.currentZoom;
@@ -148,6 +146,7 @@ export default class DocumentView extends Component {
         this.viewer.addHandler('canvas-release', () => {
             this.onMouseUp();
         });
+
     }
 
     render() {
@@ -163,3 +162,6 @@ export default class DocumentView extends Component {
     }
 }
 
+DocumentView.propTypes = {
+    idDocument: PropTypes.number.isRequired
+};

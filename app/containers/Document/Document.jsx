@@ -11,7 +11,7 @@ export default class Document extends Component {
     render() {
         return (
             <DocumentView
-                idDocument = {this.props.idDocument}
+                idDocument = {1}
             />
         );
     }
