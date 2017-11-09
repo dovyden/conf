@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '../Button/Button';
 import logo from './images/logo.svg';
 import './App.css';
 
@@ -12,6 +13,10 @@ export default function App() {
             <p className="App-intro">
                 To get started, edit <code>src/components/App/App.js</code> and save to reload.
             </p>
+            <Button
+                className="App__button"
+                onClick={() => 'OK'}
+                text="Hello!" />
         </div>
     );
 }
