@@ -42,6 +42,7 @@ const coreLogger = logger({namespace: 'Core'});
 try {
     configure(app);
     useMiddlewares(app);
+    require('../voxEngine/init')();
 
     // start listening for incoming requests
     const server = app.listen(config.port, () => {
