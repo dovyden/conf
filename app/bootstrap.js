@@ -1,17 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
-import store from './utils/store';
+import {BrowserRouter} from 'react-router-dom';
 
-// we should extend b_ before it will be used
 import './utils/b-extends';
-
+import store from './utils/store';
 import './components/Page/Page';
-import App from './components/App/App';
+import App from './containers/App/App';
 
 ReactDOM.render(
     <Provider store={store}>
-        <App />
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
     </Provider>,
     document.getElementById('root')
 );

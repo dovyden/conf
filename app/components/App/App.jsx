@@ -1,11 +1,10 @@
 import React from 'react';
 import Layout from '../../containers/Layout/Layout';
-// import Toolbar from '../Toolbar/Toolbar';
+import Toolbar from '../Toolbar/Toolbar';
 
 export default function App() {
-    return (
-        <div>
-            <Layout/>
-        </div>
-    );
+    return [
+        <Layout key="layout" />,
+        <Toolbar key="toolbar" />
+    ];
 }
