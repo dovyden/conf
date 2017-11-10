@@ -26,6 +26,7 @@ function useMiddlewares(app) {
     require('./middlewares/ping')(app);
     require('./middlewares/cookie')(app);
     require('./middlewares/security')(app);
+    require('./middlewares/bodyParser')(app);
 
     // controllers
     require('./controllers')(app);
@@ -42,11 +43,14 @@ const coreLogger = logger({namespace: 'Core'});
 try {
     configure(app);
     useMiddlewares(app);
+    require('../voxEngine/init')();
 
     // start listening for incoming requests
-    app.listen(config.port, () => {
+    const server = app.listen(config.port, () => {
         coreLogger.log(`App is listening to requests (port ${config.port})`);
     });
+    const io = require('./websocket')(server);
+
 } catch (ex) {
     coreLogger.error(`Configuring app error: ${ex.stack}`);
     process.exit(1);

@@ -24,5 +24,18 @@ module.exports = {
     port: process.env.APP_PORT || 80,
 
     // assets directory
-    static: path.join(ROOT_DIR, 'build')
+    static: path.join(ROOT_DIR, 'build'),
+
+    websockets: {
+        path: '/ws',
+        transports: ['polling', 'websocket']
+    },
+
+    voxEngine: {
+        userName: 'user1',
+        userPass: 'foruser1',
+        appName: 'ingipro-practice',
+        accountName: 'dovyden',
+        accountPass: 'bYY-xm4-Ts4-HFH'
+    }
 };
