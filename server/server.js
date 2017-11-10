@@ -26,6 +26,7 @@ function useMiddlewares(app) {
     require('./middlewares/ping')(app);
     require('./middlewares/cookie')(app);
     require('./middlewares/security')(app);
+    require('./middlewares/bodyParser')(app);
 
     // controllers
     require('./controllers')(app);
