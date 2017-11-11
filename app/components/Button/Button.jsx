@@ -5,20 +5,18 @@ import './Button.css';
 
 const b = b_.lock('button');
 
-export default function Button({className, onClick, text}) {
+export default function Button({className, onClick, ...props}) {
     return (
         <button
             className={b.mix(className)}
             onClick={onClick}>
-            {text}
+            {props.children}
         </button>
     );
 }
 
 Button.propTypes = {
-    className: PropTypes.string.isRequired,
-    onClick: PropTypes.func.isRequired,
-    text: PropTypes.string,
-    src: PropTypes.string
+    className: PropTypes.string,
+    onClick: PropTypes.func.isRequired
 };
 

@@ -15,8 +15,9 @@ export default function App() {
             </p>
             <Button
                 className="App__button"
-                onClick={() => 'OK'}
-                text="Hello!" />
+                onClick={() => 'OK'}>
+                Hello!
+            </Button>
         </div>
     );
 }
