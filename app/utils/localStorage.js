@@ -12,9 +12,9 @@ export function save(key, value) {
 export function load(key, defaultValue) {
     try {
         const item = localStorage.getItem(key);
-        return item !== null ? JSON.parse(item) : defaultValue;
+        return JSON.parse(item) || defaultValue;
 
     } catch (err) {
-        return defaultValue;
+        return false;
     }
 }
