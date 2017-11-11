@@ -9,10 +9,10 @@ export function save(key, value) {
     }
 }
 
-export function load(key, defaultValue) {
+export function load(key) {
     try {
         const item = localStorage.getItem(key);
-        return JSON.parse(item) || defaultValue;
+        return JSON.parse(item) || undefined;
 
     } catch (err) {
         return false;

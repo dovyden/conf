@@ -24,10 +24,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // restore state-store from localStorage
 const persistedState = {
-    auth: loadFromStorage('auth', {
-        key: '',
-        token: ''
-    })
+    auth: loadFromStorage('auth')
 };
 
 // create store
