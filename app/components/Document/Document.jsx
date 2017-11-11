@@ -40,7 +40,8 @@ export default class DocumentView extends Component {
         const oldBounds = this.viewer.viewport.getBounds(true);
         const newBounds = new OpenSeadragon.Rect(0, 0, 1, oldBounds.height / oldBounds.width);
         this.viewer.viewport.fitBounds(newBounds, true);
-        this.viewer.viewport.zoomTo(1, true);
+        this.viewer.viewport.zoomTo(3, true);
+        this.currentZoom = 3;
         // TODO: method who redraw marks with newBounds and zoom
     }
 
@@ -77,8 +78,7 @@ export default class DocumentView extends Component {
                 strokeWidth: 5,
             }),
             bound: null,
-            zoom: null,
-            currentZoom: null
+            zoom: null
         };
     }
 
@@ -97,12 +97,7 @@ export default class DocumentView extends Component {
              */
             // TODO: do only one translate when drag is over(optimization)
             const delta = event.delta;
-            // const currentZoom = this.viewer.viewport.getZoom(true);
             this.marks.forEach((item) => {
-                // const newZoom = currentZoom / item.currentZoom;
-                // const interchangeableZoom = currentZoom > item.currentZoom ? currentZoom : item.currentZoom;
-                // delta.x /= interchangeableZoom;
-                // delta.y /= interchangeableZoom;
                 item.path.translate(new Point(delta.x, delta.y));
             });
         }
@@ -112,8 +107,9 @@ export default class DocumentView extends Component {
         if (this.flagMouseDownForPaper) {
             this.marks[this.countOfMarks].bound = this.viewer.viewport.getBounds(true);
             this.marks[this.countOfMarks].zoom = this.viewer.viewport.getZoom(true);
-            this.marks[this.countOfMarks].currentZoom = this.viewer.viewport.getZoom(true);
             this.countOfMarks++;
+            // const copy = this.marks[0].path.clone();
+            // copy.strokeColor = 'orange';
         }
         this.flagMouseDownForPaper = false;
 
@@ -129,28 +125,14 @@ export default class DocumentView extends Component {
         }
 
         const currentZoom = event.zoom;
-        if (currentZoom >= 6 || currentZoom <= 1) {
-            return;
-        }
+        const newZoom = currentZoom / this.currentZoom;
+        const newCenter = this.viewer.viewport.viewportToViewerElementCoordinates(event.refPoint, true);
 
-        const newCenter = this.viewer.viewport.deltaPixelsFromPointsNoRotate(event.refPoint, true);
-        const oldCenter = this.viewer.viewport.deltaPixelsFromPointsNoRotate(
-            this.viewer.viewport.getCenter(true), true);
-        const delta = new Point(oldCenter.x - newCenter.x, oldCenter.y - newCenter.y);
-        // const delta = new Point(oldCenter.x / this.marks[0].currentZoom - newCenter.x / currentZoom,
-        //     oldCenter.y / this.marks[0].currentZoom - newCenter.y / currentZoom);
         this.marks.forEach((item) => {
-            const newZoom = currentZoom / item.currentZoom;
-            const sign = currentZoom > item.currentZoom ? 1 : -1;
-            delta.x *= sign;
-            delta.y *= sign;
-            // const interchangeableZoom = sign === 1 ? currentZoom : item.currentZoom;
-            // delta.x /= interchangeableZoom;
-            // delta.y /= interchangeableZoom;
-            item.path.translate(delta);
-            item.path.scale(newZoom);
-            item.currentZoom = currentZoom;
+            item.path.scale(newZoom, newCenter);
         });
+
+        this.currentZoom = currentZoom;
     }
 
     render() {
