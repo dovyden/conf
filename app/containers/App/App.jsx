@@ -47,10 +47,8 @@ App.propTypes = {
     token: PropTypes.string
 };
 
-function mapStateToProps(state) {
-    return {
-        token: state.auth.token
-    };
-}
+const mapStateToProps = ({auth}) => ({
+    token: auth.token
+});
 
 export default withRouter(connect(mapStateToProps)(App));

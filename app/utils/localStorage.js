@@ -1,17 +1,19 @@
-export function save(type, payload) {
-    const serializedState = JSON.stringify(payload);
+export function save(key, value) {
+    const serializedState = JSON.stringify(value);
     try {
-        localStorage.setItem(type, serializedState);
+        localStorage.setItem(key, serializedState);
         return true;
+
     } catch (err) {
         return false;
     }
 }
 
-export function load(type, defaultValue = {}) {
+export function load(key, defaultValue) {
     try {
-        const item = localStorage.getItem(type);
-        return JSON.parse(item);
+        const item = localStorage.getItem(key);
+        return item !== null ? JSON.parse(item) : defaultValue;
+
     } catch (err) {
         return defaultValue;
     }

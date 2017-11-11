@@ -8,7 +8,7 @@ const initialState = {
     token: '',
 };
 
-export default function user(state = initialState, {type, payload}) {
+export default function authReducer(state = initialState, {type, payload}) {
     switch (type) {
         case AUTH_SUCCESS:
             return {
@@ -33,8 +33,7 @@ export default function user(state = initialState, {type, payload}) {
                 isAuthenticated,
             };
         }
-
-        default:
-            return state;
     }
+
+    return state;
 }

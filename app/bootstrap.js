@@ -3,8 +3,9 @@ import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {BrowserRouter} from 'react-router-dom';
 
-import './utils/b-extends';
 import store from './utils/store';
+import './utils/b-extends';
+
 import './components/Page/Page';
 import App from './containers/App/App';
 

@@ -8,7 +8,7 @@ import {
 } from 'redux-logger';
 import thunk from 'redux-thunk';
 
-import {load} from './localStorage';
+import {load as loadFromStorage} from './localStorage';
 import reducers from '../reducers';
 
 // add middlewares to redux store
@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // restore state-store from localStorage
 const persistedState = {
-    auth: load('auth')
+    auth: loadFromStorage('auth')
 };
 
 // create store
