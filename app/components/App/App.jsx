@@ -1,4 +1,5 @@
 import React from 'react';
+import Label from '../Label/Label';
 import logo from './images/logo.svg';
 import './App.css';
 
@@ -12,6 +13,9 @@ export default function App() {
             <p className="App-intro">
                 To get started, edit <code>src/components/App/App.js</code> and save to reload.
             </p>
+            <Label className="App__label">
+                This is label!
+            </Label>
         </div>
     );
 }
