@@ -45,7 +45,7 @@ class Navigator extends Component {
     getChildren(nodeId, nodes) {
         const children = {};
         this.props.fetchNodes({
-            query: `$$TYPE$$ = 'NODE' AND $$hier/parent$$ = ${nodeId}`
+            query: `$$TYPE$$ = 'NODE' AND $$hier/parent$$ = '${nodeId}'`
         });
         for (const node in nodes) {
             if (nodes[node]['hier/parent'] === nodeId) {

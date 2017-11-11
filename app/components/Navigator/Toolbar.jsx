@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import b_ from 'b_';
 
-import './Navigator.css';
+import './Toolbar.css';
 
 const b = b_.lock('navigator-toolbar');
 
