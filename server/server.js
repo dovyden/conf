@@ -1,57 +1,42 @@
 'use strict';
 
-const express = require('express');
+const cluster = require('cluster');
 const config = require('./libs/config');
 const logger = require('./libs/logger');
+require('./utils/unhandled-errors');
 
+// run cluster
+if (cluster.isMaster) {
+    const masterLogger = logger({namespace: 'Master'});
+    masterLogger.log(`Master ${process.pid} is running`);
 
-// app
-function configure(app) {
-    app.disable('etag');
-    app.disable('x-powered-by');
-    app.set('case sensitive routing', true);
-    app.set('env', process.env.NODE_ENV || 'development');
-    app.set('strict routing', true);
-    app.set('trust proxy', 1);
-}
+    cluster.on('message', (worker, message) => {
+        const {type, payload} = message;
 
-function useMiddlewares(app) {
-    // prepare and start request handle
-    require('./middlewares/init')(app);
+        switch (type) {
+            case 'EXAMPLE_UPDATE_DATA':
+                masterLogger.info(`Message from worker (${worker.process.pid}): ${type}: ${payload}`);
 
-    // serve static
-    require('./middlewares/static')(app);
-
-    // common middlewares
-    require('./middlewares/ping')(app);
-    require('./middlewares/cookie')(app);
-    require('./middlewares/security')(app);
-    require('./middlewares/bodyParser')(app);
-
-    // controllers
-    require('./controllers')(app);
-    require('./middlewares/errorhandler')(app);
-}
-
-// extend express
-require('./libs/express-extensions');
-
-// create app
-const app = express();
-const coreLogger = logger({namespace: 'Core'});
-
-try {
-    configure(app);
-    useMiddlewares(app);
-    require('../voxEngine/init')();
-
-    // start listening for incoming requests
-    const server = app.listen(config.port, () => {
-        coreLogger.log(`App is listening to requests (port ${config.port})`);
+                // resend message to other workers
+                for (const id in cluster.workers) {
+                    if (worker.id !== Number(id)) {
+                        cluster.workers[id].send(message);
+                    }
+                }
+                break;
+        }
     });
-    const io = require('./websocket')(server);
+    cluster.on('exit', (worker, code, signal) => {
+        masterLogger.log(`Worker (${worker.process.pid}, ${code}, ${signal}) died, respawn...`);
+        cluster.fork();
+    });
 
-} catch (ex) {
-    coreLogger.error(`Configuring app error: ${ex.stack}`);
-    process.exit(1);
+    for (let i = 0; i < config.workers; i++) {
+        cluster.fork();
+    }
+} else {
+    const workerLogger = logger({namespace: 'Worker'});
+    workerLogger.log(`Worker (${process.pid}) started`);
+
+    require('./worker');
 }

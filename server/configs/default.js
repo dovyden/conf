@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const os = require('os');
 
 const ROOT_DIR = process.cwd();
 const appData = require(path.join(ROOT_DIR, 'package.json'));
@@ -37,5 +38,8 @@ module.exports = {
         appName: 'ingipro-practice',
         accountName: 'dovyden',
         accountPass: 'bYY-xm4-Ts4-HFH'
-    }
+    },
+
+    // workers count
+    workers: os.cpus().length
 };
