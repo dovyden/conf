@@ -26,7 +26,6 @@ function useMiddlewares(app) {
     require('./middlewares/ping')(app);
     require('./middlewares/cookie')(app);
     require('./middlewares/security')(app);
-    require('./middlewares/bodyParser')(app);
 
     // controllers
     require('./controllers')(app);
@@ -43,7 +42,6 @@ const workerLogger = logger({namespace: 'Worker'});
 try {
     configure(app);
     useMiddlewares(app);
-    require('../voxEngine/init')();
 
     // listen messages from master
     process.on('message', ({type, payload}) => {
@@ -65,7 +63,8 @@ try {
     const server = app.listen(config.port, () => {
         workerLogger.log(`Worker (${process.pid}) is listening to requests (port ${config.port})`);
     });
-    const io = require('./websocket')(server);
+    // init websockets
+    require('./websocket')(server);
 
 } catch (ex) {
     workerLogger.error(`Configuring worker (${process.pid}) error: ${ex.stack}`);

@@ -2,14 +2,23 @@
 
 const config = require('../../libs/config');
 const crypto = require('crypto');
-const md5 = crypto.createHash('md5');
-const {userName, accountPass} = config.voxEngine;
 
-module.exports = (payload, socket) => {
+const {
+    userName,
+    accountPass
+} = config.voxEngine;
+
+module.exports = (socket, payload) => {
     const {key} = payload;
-    const token = md5(`${key}|${md5(`${userName}:voximplant.com:${accountPass}`)}`);
+
+    const passwd = crypto.createHash('md5');
+    passwd.update(`${userName}:voximplant.com:${accountPass}`);
+
+    const token = crypto.createHash('md5');
+    token.update(`${key}|${passwd.digest('hex')}`);
+
     socket.emit('message', {
-        type: 'key-vox',
-        payload: token
+        type: 'KEY-VOX',
+        payload: token.digest('hex')
     });
 };

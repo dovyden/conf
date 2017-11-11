@@ -1,27 +1,24 @@
 'use strict';
 
+const socketIo = require('socket.io');
 const config = require('../libs/config');
-const soketIO = require('socket.io');
 
 module.exports = (server) => {
-
-    const io = soketIO(server, config.websockets);
+    const io = socketIo(server, config.websockets);
 
     io.on('connection', (socket) => {
-
         socket
             .on('message', ({type, payload}) => {
                 try {
-                    return require(`case/${type}`)(payload, socket);
+                    return require(`./case/${type.toLowerCase()}`)(socket, payload);
                 } catch (ex) {
-                    return require('case/default')(payload);
+                    return require('./case/default')(socket, payload);
                 }
             })
-
             .on('disconnect', () => {})
-
-            .on('error', (error) => {});
-
+            .on('error', (error) => {  // eslint-disable-line no-unused-vars
+                // websockerLogger.error('Something wrong happens!', error);
+            });
     });
 
     return io;

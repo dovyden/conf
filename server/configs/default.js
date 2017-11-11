@@ -13,7 +13,8 @@ module.exports = {
 
     // backend list for data providers
     backend: {
-        node: 'https://test.knevod.com/node'
+        node: 'https://test.knevod.com/node',
+        voximplant: 'https://api.voximplant.com/platform_api'
     },
 
     // cookies parser
@@ -27,17 +28,19 @@ module.exports = {
     // assets directory
     static: path.join(ROOT_DIR, 'build'),
 
-    websockets: {
-        path: '/ws',
-        transports: ['polling', 'websocket']
-    },
-
+    // vox implant account
     voxEngine: {
-        userName: 'user1',
-        userPass: 'foruser1',
         appName: 'ingipro-practice',
         accountName: 'dovyden',
-        accountPass: 'bYY-xm4-Ts4-HFH'
+        accountPass: process.env.VOX_IMPLANT_PASS,
+        userName: 'user1',
+        userPass: 'foruser1'
+    },
+
+    // socket.io settings
+    websockets: {
+        path: '/ws',
+        transports: ['websocket', 'polling']
     },
 
     // workers count
