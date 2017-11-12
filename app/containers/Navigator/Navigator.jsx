@@ -4,10 +4,25 @@ import {connect} from 'react-redux';
 
 import {fetchNodes} from '../../actions/navigator';
 import NodesList from '../../components/Navigator/NodesList';
+import Spinner from '../../components/Spinner/Spinner';
 import Toolbar from '../../components/Navigator/Toolbar';
 
 class Navigator extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {loading: false};
+        this.downloadNodes = this.downloadNodes.bind(this);
+    }
+
     render() {
+        if (this.state.loading > 0) {
+            return (
+                <div>
+                    <Spinner position="center"/>
+                </div>
+            );
+        }
         const {nodes, nodeId} = this.props;
         const children = this.getChildren(nodeId, nodes);
         const path = this.getPath(nodeId, nodes);
@@ -19,16 +34,50 @@ class Navigator extends Component {
         );
     }
 
-    componentWillReceiveProps(newProps) {
-        if (newProps.nodeId === null) {
-            this.props.fetchNodes({
-                query: `$$TYPE$$ = 'NODE' AND $$hier/parent$$ = ''`
-            });
+    componentWillMount() {
+        const {nodeId, nodes, root} = this.props;
+        this.downloadNodes({nodeId, nodes, root}, this.state.loading);
+    }
+
+    shouldComponentUpdate(newProps, newState) {
+        for (const nodeId in newProps.nodes) {
+            if (this.props.nodes[nodeId] === undefined) {
+                this.downloadNodes(newProps, newState.loading);
+            }
         }
-        if (this.props.nodes[newProps.nodeId] === undefined) {
-            this.props.fetchNodes({
-                nodes: [this.props.nodeId]
-            });
+        return !newState.loading;
+    }
+
+    downloadNodes({nodeId, nodes, root}, loading) {
+        if (!loading) {
+            if (nodeId !== '') {
+                if (nodes[nodeId] === undefined) {
+                    this.props.fetchNodes({
+                        query: `$$TYPE$$ = 'NODE' AND $$hier/parent$$ = '${nodeId}' OR $$sec/owner$$ = '${nodeId}'`
+                    });
+                    this.setState({loading: true});
+                }
+            } else {
+                this.props.fetchNodes({
+                    query: `$$TYPE$$ = 'NODE' AND $$hier/parent$$ = ''`
+                });
+                this.setState({loading: true});
+            }
+        } else {
+            if (nodeId !== '' && root === undefined) {
+                let parentId = nodeId;
+                while (parentId !== 0) {
+                    if (nodes[parentId] === undefined) {
+                        this.props.fetchNodes({
+                            nodes: [parentId]
+                        });
+                        this.setState({loading: true});
+                        return;
+                    }
+                    parentId = nodes[parentId]['hier/parent'];
+                }
+            }
+            this.setState({loading: false});
         }
     }
 
@@ -42,14 +91,18 @@ class Navigator extends Component {
         return path;
     }
 
-    getChildren(nodeId, nodes) {
+    getChildren(parId, nodes) {
         const children = {};
-        this.props.fetchNodes({
-            query: `$$TYPE$$ = 'NODE' AND $$hier/parent$$ = '${nodeId}'`
-        });
-        for (const node in nodes) {
-            if (nodes[node]['hier/parent'] === nodeId) {
-                Object.assign(children, nodes[node]);
+        let parentId = parId;
+        if (parentId === '') {
+            parentId = 0;
+        }
+        for (const nodeId in nodes) {
+            const node = nodes[nodeId];
+            if (node['hier/parent'] === parentId && node['removed'] !== 1) {
+                const newNode = {};
+                newNode[nodeId] = node;
+                Object.assign(children, newNode);
             }
         }
         return children;
@@ -61,14 +114,14 @@ Navigator.propTypes = {
     navigateTo: PropTypes.func.isRequired,
     scroll: PropTypes.number,
     nodes: PropTypes.object.isRequired,
-    root: PropTypes.object.isRequired,
+    root: PropTypes.array,
     fetchNodes: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state, ownProps) {
     return {
         nodeId: ownProps.nodeId,
-        navigateTo: ownProps.nodeId,
+        navigateTo: ownProps.navigateTo,
         scroll: ownProps.scroll,
         nodes: state.navigator.nodes,
         root: state.navigator.root

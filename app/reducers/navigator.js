@@ -5,15 +5,13 @@ const initialState = {
     root: undefined
 };
 
-export default function navigatorReducer(state = initialState, {type, payload}) {
+export default function navigatorReducer(state = initialState, {type, fetchRoot, payload}) {
     switch (type) {
         case STORE_NODES: {
-            let root = [];
-            if (state.root !== undefined) {
-                root = state.root;
-            }
-            for (const nodeId in payload) {
-                if (nodeId['hier/parent'] === 0 && !root.includes(nodeId)) {
+            let root = state.root;
+            if (fetchRoot) {
+                root = [];
+                for (const nodeId in payload) {
                     root.push(nodeId);
                 }
             }
