@@ -8,10 +8,10 @@ const b = b_.lock('layout');
 
 const Tape = ({children, direction, size, type}) => {
     const styleProp = {
-        flexBasis: size,
+        flexBasis: `${size}%`,
     };
 
-    return (size !== '0%')
+    return (size !== 0)
         ? (<div className={direction ? b(type, {[direction]: true}) : b(type)} style={styleProp}>
             {children}
         </div>)

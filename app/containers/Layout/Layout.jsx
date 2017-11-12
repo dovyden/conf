@@ -25,23 +25,44 @@ class Layout extends Component {
 
         this.state = {
             currentState: state,
-            top: 0,                         //4 splitters %
+            top: 0,                         // 4 splitters %
             bottom: 100,
             left: 0,
             right: 100,
-            hiddenSplitters: '',            //display: none for splitters
-            contentId: [0, null, null, null],   //for beginning doesn't matter
+            hiddenSplitters: '',            // display: none for splitters
+            contentId: [0, null, null, null],   // for beginning doesn't matter
 
-            draggingSplitters: '',          //type of dragging
-            isDragging: false,              //state of dragging
-            parentWidth: 0,                 //of tape
-            parentHeight: 0,                //depend on size of splitter
+            // position: {                     // splitter's position
+            //     top: 0,
+            //     bottom: 100,
+            //     left: 0,
+            //     right: 100,
+            // },
+            //
+            // size: {                         // splitter's size
+            //     top: 100,
+            //     bottom: 100,
+            //     left: 100,
+            //     right: 100,
+            // },
+
+            mainSplitter: '',               // splitter for tapes' division
+            secondarySplitter: {            // splitter for cells' division
+                firstTape: '',
+                secondTape: '',
+            },
+
+            draggingSplitters: '',          // type of dragging
+            isDragging: false,              // state of dragging
+            parentWidth: 0,                 // of tape
+            parentHeight: 0,                // depend on size of splitter
             offsetX: 0,
             offsetY: 0,
 
-            minSizeOfCell: 50,              //for creating and deleting
-            sizeOfBox: 20,                  //for dragging intersection point
+            minSizeOfCell: 50,              // for creating and deleting
+            sizeOfBox: 20,                  // for dragging intersection point
         };
+        this.mouseDownLine = this.mouseDownLine.bind(this);
     }
 
     componentDidMount() {
@@ -61,16 +82,16 @@ class Layout extends Component {
                 break;
 
             case 'left':
-            case 'right':
+            case 'right': {
                 const type1 = e.target.dataset.type;
                 const type2 = this.possibleDownTo2(e);
                 if (type2) {
-
                     this.downTo2(e, `${type1} ${type2}`);
                 } else {
                     this.downTo3(e, type1);
                 }
                 break;
+            }
         }
     }
     down2(e) {
@@ -84,7 +105,7 @@ class Layout extends Component {
                 break;
 
             case 'left':
-            case 'right':
+            case 'right': {
                 const type1 = e.target.dataset.type;
                 const type2 = this.possibleDownTo2(e);
                 if (type2) {
@@ -93,6 +114,7 @@ class Layout extends Component {
                     this.downTo5();
                 }
                 break;
+            }
         }
     }
     down3(e) {
@@ -104,47 +126,63 @@ class Layout extends Component {
     }
 
     down4() {
-        if ('pos of splitter !== 0% or 100%') {
-            if ('type of splitter === left or right') {
-                this.possibleDownTo4();
-            } else {
-
-            }
-            if ('size of splitter !== 100%') {
-
-            }
-
-        } else {
-            this.downTo4();         // e.target.dataset.type: top, bottom, ...
-        }
+        // if ('pos of splitter !== 0% or 100%') {
+        //     if ('type of splitter === left or right') {
+        //         this.possibleDownTo4();
+        //     } else {
+        //
+        //     }
+        //     if ('size of splitter !== 100%') {
+        //
+        //     }
+        //
+        // } else {
+        //     this.downTo4();         // e.target.dataset.type: top, bottom, ...
+        // }
     }
 
     possibleDownTo2(e) {
-        return (Math.abs(e.clientY - this.state.top * e.target.parentElement.clientHeight
-            / 100) < this.state.sizeOfBox) ? 'top' :
-            (Math.abs(this.state.bottom * e.target.parentElement.clientHeight / 100
-                - e.clientY) < this.state.sizeOfBox) ? 'bottom' : '';
+        const maybeBottom = (Math.abs(e.clientY - this.state.bottom
+            * e.target.parentElement.clientHeight / 100)
+            < this.state.sizeOfBox) ? 'bottom' : '';
+
+
+        return (Math.abs(e.clientY - this.state.top
+            * e.target.parentElement.clientHeight / 100) < this.state.sizeOfBox)
+            ? 'top' : maybeBottom;
     }
 
-    possibleDownTo4(e) {
-
-    }
+    // possibleDownTo4(e) {
+    //
+    // }
 
     downTo2(e, types) {
-        const opposite = (types === 'left top') ? 'right bottom' :
-            (types === 'right bottom') ? 'left top' :
-            (types === 'left bottom') ? 'right top' : 'left bottom';
+        let opposite;
+        switch (types) {
+            case 'left top':
+                opposite = 'right bottom';
+                break;
+            case 'right bottom':
+                opposite = 'left top';
+                break;
+            case 'left bottom':
+                opposite = 'right top';
+                break;
+            case 'right top':
+                opposite = 'left bottom';
+                break;
+        }
 
         let contentId = [];
         switch (this.state.currentState) {
             case 1:
-                contentId = (types === 'left top') ?
-                    [null, null, null, this.props.layout.cell[0].contentId] :
-                    (types === 'right bottom') ?
-                        [this.props.layout.cell[0].contentId, null, null, null] :
-                        (types === 'left bottom') ?
-                            [null, null, this.props.layout.cell[0].contentId, null] :
-                            [null, this.props.layout.cell[0].contentId, null, null];
+                contentId = (types === 'left top')
+                    ? [null, null, null, this.props.layout.cell[0].contentId]
+                    : (types === 'right bottom')
+                        ? [this.props.layout.cell[0].contentId, null, null, null]
+                        : (types === 'left bottom')
+                            ? [null, null, this.props.layout.cell[0].contentId, null]
+                            : [null, this.props.layout.cell[0].contentId, null, null];
                 break;
             case 2:
                 contentId = this.state.contentId;
@@ -163,34 +201,38 @@ class Layout extends Component {
 
             parentHeight: e.target.parentElement.clientHeight,
             parentWidth: e.target.parentElement.clientWidth,
-            offsetX: e.clientX - this.state[arr[0]] *
-                e.target.parentElement.clientWidth / 100,
-            offsetY: e.clientY - this.state[arr[1]] *
-                e.target.parentElement.clientHeight / 100,
+            offsetX: e.clientX - this.state[arr[0]]
+                * e.target.parentElement.clientWidth / 100,
+            offsetY: e.clientY - this.state[arr[1]]
+                * e.target.parentElement.clientHeight / 100,
         });
     }
     downTo3(e, type) {
-        const opposite = (type === 'top') ? 'bottom' :
-            (type === 'bottom') ? 'top' :
-            (type === 'left') ? 'right' : 'left';
+        const opposite = (type === 'top') ? 'bottom'
+            : (type === 'bottom') ? 'top'
+                : (type === 'left') ? 'right' : 'left';
 
         let contentId = [];
         switch (this.state.currentState) {
             case 1:
-                contentId = (type === 'top' || type === 'left') ?
-                    [null, null, this.props.layout.cell[0].contentId, null] :
-                    [this.props.layout.cell[0].contentId, null, null, null];
+                contentId = (type === 'top' || type === 'left')
+                    ? [null, null, this.props.layout.cell[0].contentId, null]
+                    : [this.props.layout.cell[0].contentId, null, null, null];
                 break;
             case 3:
                 contentId = this.state.contentId;
                 break;
         }
 
-        const arr = (type === 'left' || type === 'right') ?
-            [e.clientX - this.state[type] *
-                e.target.parentElement.clientWidth / 100, 0] :
-            [0, e.clientY - this.state[type] *
-                e.target.parentElement.clientHeight / 100];
+        const arr = (type === 'left' || type === 'right')
+            ? [
+                e.clientX - this.state[type] * e.target.parentElement.clientWidth / 100,
+                0
+            ]
+            : [
+                0,
+                e.clientY - this.state[type] * e.target.parentElement.clientHeight / 100
+            ];
 
         this.setState({
             ...this.state,
@@ -206,18 +248,18 @@ class Layout extends Component {
             offsetY: arr[1],
         });
     }
-    downTo4 = (e) => {}
-    downTo5 = (e) => {}
+    downTo4() {}
+    downTo5() {}
 
     move2(e) {
         const arr = this.state.draggingSplitters.split(' ');
 
         this.setState({
             ...this.state,
-            [arr[0]]: (e.clientX - this.state.offsetX) /
-                this.state.parentWidth * 100,
-            [arr[1]]: (e.clientY - this.state.offsetY) /
-                this.state.parentHeight * 100,
+            [arr[0]]: (e.clientX - this.state.offsetX)
+                / this.state.parentWidth * 100,
+            [arr[1]]: (e.clientY - this.state.offsetY)
+                / this.state.parentHeight * 100,
         });
     }
     move3(e) {
@@ -241,29 +283,39 @@ class Layout extends Component {
             contentId = this.possibleUpTo2(e, 2);
             if (contentId !== false) {
                 this.upTo2(this.state.draggingSplitters,
-                    this.state[arr[0]] + this.state.offsetX /
-                        this.state.parentWidth * 100,
-                    this.state[arr[1]] + this.state.offsetY /
-                        this.state.parentHeight * 100, contentId);
+                    this.state[arr[0]] + this.state.offsetX
+                        / this.state.parentWidth * 100,
+                    this.state[arr[1]] + this.state.offsetY
+                        / this.state.parentHeight * 100, contentId);
             } else {
-                (e.clientY < this.state.minSizeOfCell) ?
-                    this.upTo3(arr[0], (e.clientX - this.state.offsetX) /
-                        this.state.parentWidth * 100, [this.state.contentId[1],
-                        null,  this.state.contentId[3], null]) :
-
-                    (e.clientY > this.state.parentHeight - this.state.minSizeOfCell) ?
-                        this.upTo3(arr[0], (e.clientX - this.state.offsetX) /
-                            this.state.parentWidth * 100, [this.state.contentId[0],
-                            null,  this.state.contentId[2], null]) :
-
-                        (e.clientX < this.state.minSizeOfCell) ?
-                            this.upTo3(arr[1], (e.clientY - this.state.offsetY) /
-                                this.state.parentHeight * 100, [this.state.contentId[2],
-                                null,  this.state.contentId[3], null]) :
-
-                            this.upTo3(arr[1], (e.clientY - this.state.offsetY) /
-                                this.state.parentHeight * 100, [this.state.contentId[0],
-                                null,  this.state.contentId[1], null])
+                (e.clientY < this.state.minSizeOfCell)
+                    ? this.upTo3(arr[0], (e.clientX - this.state.offsetX)
+                        / this.state.parentWidth * 100, [
+                        this.state.contentId[1],
+                        null,
+                        this.state.contentId[3],
+                        null
+                    ]) : (e.clientY > this.state.parentHeight - this.state.minSizeOfCell)
+                        ? this.upTo3(arr[0], (e.clientX - this.state.offsetX)
+                            / this.state.parentWidth * 100, [
+                            this.state.contentId[0],
+                            null,
+                            this.state.contentId[2],
+                            null
+                        ]) : (e.clientX < this.state.minSizeOfCell)
+                            ? this.upTo3(arr[1], (e.clientY - this.state.offsetY)
+                                / this.state.parentHeight * 100, [
+                                this.state.contentId[2],
+                                null,
+                                this.state.contentId[3],
+                                null
+                            ]) : this.upTo3(arr[1], (e.clientY - this.state.offsetY)
+                                / this.state.parentHeight * 100, [
+                                this.state.contentId[0],
+                                null,
+                                this.state.contentId[1],
+                                null
+                            ]);
             }       // change!
         }
     }
@@ -273,9 +325,9 @@ class Layout extends Component {
             this.upTo1(contentId);
         } else {
             const pos = (this.state.draggingSplitters === 'top' ||
-                this.state.draggingSplitters === 'bottom') ?
-                e.clientY / this.state.parentHeight * 100 :
-                e.clientX / this.state.parentWidth * 100;
+                this.state.draggingSplitters === 'bottom')
+                ? e.clientY / this.state.parentHeight * 100
+                : e.clientX / this.state.parentWidth * 100;
 
             this.upTo3(this.state.draggingSplitters, pos, this.state.contentId);
         }
@@ -283,21 +335,21 @@ class Layout extends Component {
 
     possibleUpTo1(e, previousState) {
         const top = (e.clientY < this.state.minSizeOfCell);
-        const bottom = (e.clientY > this.state.parentHeight -
-            this.state.minSizeOfCell);
+        const bottom = (e.clientY > this.state.parentHeight
+            - this.state.minSizeOfCell);
         const left = (e.clientX < this.state.minSizeOfCell);
-        const right = (e.clientX > this.state.parentWidth -
-            this.state.minSizeOfCell);
+        const right = (e.clientX > this.state.parentWidth
+            - this.state.minSizeOfCell);
 
         switch (previousState) {
             case 2:
-                return (top && left) ? [this.state.contentId[3], null, null, null] :                    // 0,1,2,3 content id
-                    (top && right) ? [this.state.contentId[1], null, null, null] :
-                        (bottom && left) ? [this.state.contentId[2], null, null, null] :
-                            (bottom && right) ? [this.state.contentId[0], null, null, null] : false;    // false
+                return (top && left) ? [this.state.contentId[3], null, null, null]
+                    : (top && right) ? [this.state.contentId[1], null, null, null]
+                        : (bottom && left) ? [this.state.contentId[2], null, null, null]
+                            : (bottom && right) ? [this.state.contentId[0], null, null, null] : false;
             case 3:
-                return (top || left) ?  [this.state.contentId[2], null, null, null] :                   // 0 and 2 content id
-                    (bottom || right) ? [this.state.contentId[0], null, null, null] : false;            // false
+                return (top || left) ? [this.state.contentId[2], null, null, null]
+                    : (bottom || right) ? [this.state.contentId[0], null, null, null] : false;
             // case 4:
             // case 5:              all must return id or  false;
         }
@@ -308,10 +360,10 @@ class Layout extends Component {
             case 2:
                 if (e.clientY > this.state.minSizeOfCell &&
                     e.clientX > this.state.minSizeOfCell &&
-                    e.clientY < this.state.parentHeight -
-                                this.state.minSizeOfCell &&
-                    e.clientX < this.state.parentWidth -
-                                this.state.minSizeOfCell) {
+                    e.clientY < this.state.parentHeight
+                        - this.state.minSizeOfCell &&
+                    e.clientX < this.state.parentWidth
+                        - this.state.minSizeOfCell) {
                     return this.state.contentId;
                 } else {
                     return false;
@@ -346,9 +398,9 @@ class Layout extends Component {
         });
     }
     upTo2(types, size, sizeOfCell, contentId) {
-        const opposite = (types === 'left top') ? 'right bottom' :
-            (types === 'right bottom') ? 'left top' :
-            (types === 'left bottom') ? 'right top' : 'left bottom';
+        const opposite = (types === 'left top') ? 'right bottom'
+            : (types === 'right bottom') ? 'left top'
+                : (types === 'left bottom') ? 'right top' : 'left bottom';
 
         this.setState({
             ...this.state,
@@ -370,13 +422,11 @@ class Layout extends Component {
         });
     }
     upTo3(type, size, contentId) {
-        const direction = (type === 'top' || type === 'bottom') ? 'column' :
-            'row';
-        const opposite = (type === 'top') ? 'bottom' :
-            (type === 'bottom') ? 'top' :
-            (type === 'left') ? 'right' : 'left';
+        const direction = (type === 'top' || type === 'bottom') ? 'column' : 'row';
+        const opposite = (type === 'top') ? 'bottom' : (type === 'bottom')
+            ? 'top' : (type === 'left') ? 'right' : 'left';
 
-        let splitters = {
+        const splitters = {
             top: 0,
             bottom: 100,
             left: 0,
@@ -420,28 +470,28 @@ class Layout extends Component {
                 case 4:
                     this.down4(e);
                     break;
-                case 5:
-                    this.down5(e);
-                    break;
+                // case 5:
+                //     this.down5(e);
+                //     break;
             }
         }
     }
     mouseMoveLine(e) {
         if (this.state.isDragging) {
             unFocus(document, window);
-            switch (this.state.currentState){
+            switch (this.state.currentState) {
                 case 2:
                     this.move2(e);
                     break;
                 case 3:
                     this.move3(e);
                     break;
-                case 4:
-                    this.move4(e);
-                    break;
-                case 5:
-                    this.move5(e);
-                    break;
+                // case 4:
+                //     this.move4(e);
+                //     break;
+                // case 5:
+                //     this.move5(e);
+                //     break;
             }
         }
     }
@@ -454,12 +504,12 @@ class Layout extends Component {
                 case 3:
                     this.up3(e);
                     break;
-                case 4:
-                    this.up4(e);
-                    break;
-                case 5:
-                    this.up5(e);
-                    break;
+                // case 4:
+                //     this.up4(e);
+                //     break;
+                // case 5:
+                //     this.up5(e);
+                //     break;
             }
         }
     }
@@ -483,55 +533,55 @@ class Layout extends Component {
         return (
             <LayoutComponent
                 direction={direction}
-                mousedown={this.mouseDownLine.bind(this)}
+                mousedown={this.mouseDownLine}
             >
                 <Splitter
                     type={'top'}
-                    position={`${top}%`}
+                    position={top}
                     display = {hiddenSplitters}
                 />
                 <Splitter
                     type={'bottom'}
-                    position={`${bottom}%`}
+                    position={bottom}
                     display = {hiddenSplitters}
                 />
                 <Splitter
                     type={'left'}
-                    position={`${left}%`}
+                    position={left}
                     display = {hiddenSplitters}
                 />
                 <Splitter
                     type={'right'}
-                    position={`${right}%`}
+                    position={right}
                     display = {hiddenSplitters}
                 />
                 <Tape
                     type={'tape'}
                     direction={(direction === 'row') ? 'column' : 'row'}
-                    size={`${tape[0]}%`}
+                    size={tape[0]}
                 >
                     <Tape
                         type={'cell'}
-                        size={`${cell[0].flexBasis}%`}
+                        size={cell[0].flexBasis}
                     >{cell[0].contentId}</Tape>
                     <Tape
                         type={'cell'}
-                        size={`${cell[1].flexBasis}%`}
+                        size={cell[1].flexBasis}
                     >{cell[1].contentId}</Tape>
                 </Tape>
 
                 <Tape
                     type={'tape'}
                     direction={(direction === 'row') ? 'column' : 'row'}
-                    size={`${tape[1]}%`}
+                    size={tape[1]}
                 >
                     <Tape
                         type={'cell'}
-                        size={`${cell[2].flexBasis}%`}
+                        size={cell[2].flexBasis}
                     >{cell[2].contentId}</Tape>
                     <Tape
                         type={'cell'}
-                        size={`${cell[3].flexBasis}%`}
+                        size={cell[3].flexBasis}
                     >{cell[3].contentId}</Tape>
                 </Tape>
             </LayoutComponent>
@@ -540,7 +590,8 @@ class Layout extends Component {
 }
 
 Layout.propTypes = {
-    data: PropTypes.object,
+    layout: PropTypes.object,                   // need full version
+    changeLayout: PropTypes.func,
 };
 
 function mapStateToProps(state) {
@@ -556,4 +607,3 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Layout);
-        

@@ -10,7 +10,7 @@ const Splitter = ({type, position, display}) => {
     const stylePosition = {};
     const pos = type === 'bottom' || type === 'top' ? 'top' : 'left';
 
-    stylePosition[pos] = position;
+    stylePosition[pos] = `${position}%`;
 
     if (!(display.indexOf(type) + 1)) {     // -1 not found, but 0 found => + 1
         return (
