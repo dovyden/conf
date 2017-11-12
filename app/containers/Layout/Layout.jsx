@@ -2,8 +2,9 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
-import {changeLayout} from '../../actions/layout';
+import {changeLayout, navigateTo} from '../../actions/layout';
 import LayoutComponent from '../../components/Layout/Layout';
+import Navigator from '../Navigator/Navigator';
 import Tape from '../../components/Layout/Tape';
 import Splitter from '../../components/Layout/Splitter';
 
@@ -71,6 +72,12 @@ class Layout extends Component {
             sizeOfBox: 20,                  // for dragging intersection point
         };
         this.mouseDownLine = this.mouseDownLine.bind(this);
+
+        // Navigate func binding
+        this.navigateTo1stCell = this.navigate.bind(this, 0);
+        this.navigateTo2ndCell = this.navigate.bind(this, 1);
+        this.navigateTo3rdCell = this.navigate.bind(this, 2);
+        this.navigateTo4thCell = this.navigate.bind(this, 3);
     }
 
     componentDidMount() {
@@ -505,7 +512,7 @@ class Layout extends Component {
             tape: 100,
             cellOf1stTape: 100,
             cellOf2ndTape: 0,
-            contentId: [...contentId],
+            contentId,
         });
     }
     upTo2(types, size, sizeOfCell, contentId) {
@@ -651,6 +658,15 @@ class Layout extends Component {
         }
     }
 
+    navigate(id, type, contentId) {
+        const {navigateTo} = this.props;
+
+        const {cell} = this.props.layout;
+        const cellId = cell[id].contentId;
+
+        navigateTo({type, cellId, contentId});
+    }
+
     render() {
         const {
             top,
@@ -663,7 +679,7 @@ class Layout extends Component {
         const {
             tape,
             cell,
-            content,
+            content
         } = this.props.layout;
 
         const {direction} = this.props.layout.root;
@@ -701,11 +717,11 @@ class Layout extends Component {
                     <Tape
                         type={'cell'}
                         size={cell[0].flexBasis}
-                    >{content[cell[0].contentId].id}</Tape>
+                    ><Navigator navigateTo={this.navigateTo1stCell} nodeId={content[cell[0].contentId].id}/></Tape>
                     <Tape
                         type={'cell'}
                         size={cell[1].flexBasis}
-                    >{content[cell[1].contentId].id}</Tape>
+                    ><Navigator navigateTo={this.navigateTo2ndCell} nodeId={content[cell[1].contentId].id}/></Tape>
                 </Tape>
 
                 <Tape
@@ -716,11 +732,11 @@ class Layout extends Component {
                     <Tape
                         type={'cell'}
                         size={cell[2].flexBasis}
-                    >{content[cell[2].contentId].id}</Tape>
+                    ><Navigator navigateTo={this.navigateTo3rdCell} nodeId={content[cell[2].contentId].id}/></Tape>
                     <Tape
                         type={'cell'}
                         size={cell[3].flexBasis}
-                    >{content[cell[3].contentId].id}</Tape>
+                    ><Navigator navigateTo={this.navigateTo4thCell} nodeId={content[cell[3].contentId].id}/></Tape>
                 </Tape>
             </LayoutComponent>
         );
@@ -730,6 +746,7 @@ class Layout extends Component {
 Layout.propTypes = {
     layout: PropTypes.object,                   // need full version
     changeLayout: PropTypes.func,
+    navigateTo: PropTypes.func,
 };
 
 function mapStateToProps(state) {
@@ -740,7 +757,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        changeLayout: (props) => dispatch(changeLayout(props))
+        changeLayout: (props) => dispatch(changeLayout(props)),
+        navigateTo: (props) => dispatch(navigateTo(props)),
     };
 }
 
