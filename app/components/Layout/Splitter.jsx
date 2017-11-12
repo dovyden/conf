@@ -23,7 +23,7 @@ const Splitter = ({type, position, display}) => {
 
 Splitter.propTypes = {
     type: PropTypes.string,
-    position: PropTypes.string,
+    position: PropTypes.number,
     display: PropTypes.string,
 };
 

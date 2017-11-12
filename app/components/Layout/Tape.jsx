@@ -21,7 +21,7 @@ const Tape = ({children, direction, size, type}) => {
 Tape.propTypes = {
     children: PropTypes.node,
     direction: PropTypes.string,
-    size: PropTypes.string,
+    size: PropTypes.number,
     type: PropTypes.string,
 };
 

@@ -30,8 +30,8 @@ class Layout extends Component {
             left: 0,
             right: 100,
             hiddenSplitters: '',            // display: none for splitters
-            contentId: [0, null, null, null],   // for beginning doesn't matter
-
+            contentId: [0, 1, 2, 3],        // for beginning doesn't matter
+            //
             // position: {                     // splitter's position
             //     top: 0,
             //     bottom: 100,
@@ -45,12 +45,20 @@ class Layout extends Component {
             //     left: 100,
             //     right: 100,
             // },
-
-            mainSplitter: '',               // splitter for tapes' division
-            secondarySplitter: {            // splitter for cells' division
-                firstTape: '',
-                secondTape: '',
-            },
+            //
+            // visibility: {                   // splitter's visibility
+            //     top: true,
+            //     bottom: true,
+            //     left: true,
+            //     right: true,
+            // },
+            //
+            // dragging: {                     // splitter's visibility
+            //     top: false,
+            //     bottom: false,
+            //     left: false,
+            //     right: false,
+            // },
 
             draggingSplitters: '',          // type of dragging
             isDragging: false,              // state of dragging
@@ -142,14 +150,16 @@ class Layout extends Component {
     }
 
     possibleDownTo2(e) {
-        const maybeBottom = (Math.abs(e.clientY - this.state.bottom
-            * e.target.parentElement.clientHeight / 100)
-            < this.state.sizeOfBox) ? 'bottom' : '';
-
-
-        return (Math.abs(e.clientY - this.state.top
-            * e.target.parentElement.clientHeight / 100) < this.state.sizeOfBox)
-            ? 'top' : maybeBottom;
+        if (Math.abs(e.clientY - this.state.top
+                * e.target.parentElement.clientHeight / 100) < this.state.sizeOfBox) {
+            return 'top';
+        } else {
+            if (Math.abs(e.clientY - this.state.bottom
+                    * e.target.parentElement.clientHeight / 100) < this.state.sizeOfBox) {
+                return 'bottom';
+            }
+        }
+        return '';
     }
 
     // possibleDownTo4(e) {
@@ -175,14 +185,40 @@ class Layout extends Component {
 
         let contentId = [];
         switch (this.state.currentState) {
-            case 1:
-                contentId = (types === 'left top')
-                    ? [null, null, null, this.props.layout.cell[0].contentId]
-                    : (types === 'right bottom')
-                        ? [this.props.layout.cell[0].contentId, null, null, null]
-                        : (types === 'left bottom')
-                            ? [null, null, this.props.layout.cell[0].contentId, null]
-                            : [null, this.props.layout.cell[0].contentId, null, null];
+            case 1:             // ???
+                if (types === 'left top') {
+                    contentId = [
+                        this.state.contentId[3],
+                        this.state.contentId[1],
+                        this.state.contentId[2],
+                        this.state.contentId[0],
+                    ];
+                } else {
+                    if (types === 'right bottom') {
+                        contentId = [
+                            this.state.contentId[0],
+                            this.state.contentId[1],
+                            this.state.contentId[2],
+                            this.state.contentId[3],
+                        ];
+                    } else {
+                        if (types === 'left bottom') {
+                            contentId = [
+                                this.state.contentId[2],
+                                this.state.contentId[1],
+                                this.state.contentId[0],
+                                this.state.contentId[3],
+                            ];
+                        } else {
+                            contentId = [
+                                this.state.contentId[1],
+                                this.state.contentId[0],
+                                this.state.contentId[2],
+                                this.state.contentId[3],
+                            ];
+                        }
+                    }
+                }
                 break;
             case 2:
                 contentId = this.state.contentId;
@@ -197,7 +233,7 @@ class Layout extends Component {
             draggingSplitters: types,
             hiddenSplitters: opposite,
             isDragging: true,
-            contentId: contentId,
+            contentId,
 
             parentHeight: e.target.parentElement.clientHeight,
             parentWidth: e.target.parentElement.clientWidth,
@@ -208,16 +244,38 @@ class Layout extends Component {
         });
     }
     downTo3(e, type) {
-        const opposite = (type === 'top') ? 'bottom'
-            : (type === 'bottom') ? 'top'
-                : (type === 'left') ? 'right' : 'left';
+        let opposite;
+        switch (type) {
+            case 'top':
+                opposite = 'bottom';
+                break;
+            case 'bottom':
+                opposite = 'top';
+                break;
+            case 'left':
+                opposite = 'right';
+                break;
+            case 'right':
+                opposite = 'left';
+                break;
+        }
 
         let contentId = [];
         switch (this.state.currentState) {
             case 1:
                 contentId = (type === 'top' || type === 'left')
-                    ? [null, null, this.props.layout.cell[0].contentId, null]
-                    : [this.props.layout.cell[0].contentId, null, null, null];
+                    ? [
+                        this.state.contentId[2],
+                        this.state.contentId[1],
+                        this.state.contentId[0],
+                        this.state.contentId[3],
+                    ]
+                    : [
+                        this.state.contentId[0],
+                        this.state.contentId[1],
+                        this.state.contentId[2],
+                        this.state.contentId[3],
+                    ];
                 break;
             case 3:
                 contentId = this.state.contentId;
@@ -225,14 +283,8 @@ class Layout extends Component {
         }
 
         const arr = (type === 'left' || type === 'right')
-            ? [
-                e.clientX - this.state[type] * e.target.parentElement.clientWidth / 100,
-                0
-            ]
-            : [
-                0,
-                e.clientY - this.state[type] * e.target.parentElement.clientHeight / 100
-            ];
+            ? [e.clientX - this.state[type] * e.target.parentElement.clientWidth / 100, 0]
+            : [0, e.clientY - this.state[type] * e.target.parentElement.clientHeight / 100];
 
         this.setState({
             ...this.state,
@@ -240,7 +292,7 @@ class Layout extends Component {
             draggingSplitters: type,
             hiddenSplitters: opposite,
             isDragging: true,
-            contentId: contentId,
+            contentId,
 
             parentHeight: e.target.parentElement.clientHeight,
             parentWidth: e.target.parentElement.clientWidth,
@@ -264,9 +316,9 @@ class Layout extends Component {
     }
     move3(e) {
         const position = (this.state.draggingSplitters === 'top' ||
-            this.state.draggingSplitters === 'bottom') ?
-            (e.clientY - this.state.offsetY) / this.state.parentHeight * 100 :
-            (e.clientX - this.state.offsetX) / this.state.parentWidth * 100;
+            this.state.draggingSplitters === 'bottom')
+            ? (e.clientY - this.state.offsetY) / this.state.parentHeight * 100
+            : (e.clientX - this.state.offsetX) / this.state.parentWidth * 100;
 
         this.setState({
             ...this.state,
@@ -288,35 +340,44 @@ class Layout extends Component {
                     this.state[arr[1]] + this.state.offsetY
                         / this.state.parentHeight * 100, contentId);
             } else {
-                (e.clientY < this.state.minSizeOfCell)
-                    ? this.upTo3(arr[0], (e.clientX - this.state.offsetX)
+                if (e.clientY < this.state.minSizeOfCell) {
+                    this.upTo3(arr[0], (e.clientX - this.state.offsetX)
                         / this.state.parentWidth * 100, [
                         this.state.contentId[1],
-                        null,
+                        this.state.contentId[0],
                         this.state.contentId[3],
-                        null
-                    ]) : (e.clientY > this.state.parentHeight - this.state.minSizeOfCell)
-                        ? this.upTo3(arr[0], (e.clientX - this.state.offsetX)
+                        this.state.contentId[2],
+                    ]);
+                } else {
+                    if (e.clientY > this.state.parentHeight - this.state.minSizeOfCell) {
+                        this.upTo3(arr[0], (e.clientX - this.state.offsetX)
                             / this.state.parentWidth * 100, [
                             this.state.contentId[0],
-                            null,
+                            this.state.contentId[1],
                             this.state.contentId[2],
-                            null
-                        ]) : (e.clientX < this.state.minSizeOfCell)
-                            ? this.upTo3(arr[1], (e.clientY - this.state.offsetY)
+                            this.state.contentId[3],
+                        ]);
+                    } else {
+                        if (e.clientX < this.state.minSizeOfCell) {
+                            this.upTo3(arr[1], (e.clientY - this.state.offsetY)
                                 / this.state.parentHeight * 100, [
                                 this.state.contentId[2],
-                                null,
+                                this.state.contentId[1],
                                 this.state.contentId[3],
-                                null
-                            ]) : this.upTo3(arr[1], (e.clientY - this.state.offsetY)
+                                this.state.contentId[0],
+                            ]);
+                        } else {
+                            this.upTo3(arr[1], (e.clientY - this.state.offsetY)
                                 / this.state.parentHeight * 100, [
                                 this.state.contentId[0],
-                                null,
+                                this.state.contentId[2],
                                 this.state.contentId[1],
-                                null
+                                this.state.contentId[3],
                             ]);
-            }       // change!
+                        }
+                    }
+                }
+            }
         }
     }
     up3(e) {
@@ -341,15 +402,65 @@ class Layout extends Component {
         const right = (e.clientX > this.state.parentWidth
             - this.state.minSizeOfCell);
 
-        switch (previousState) {
+        switch (previousState) {                // ???
             case 2:
-                return (top && left) ? [this.state.contentId[3], null, null, null]
-                    : (top && right) ? [this.state.contentId[1], null, null, null]
-                        : (bottom && left) ? [this.state.contentId[2], null, null, null]
-                            : (bottom && right) ? [this.state.contentId[0], null, null, null] : false;
+                if (top && left) {
+                    return [
+                        this.state.contentId[3],
+                        this.state.contentId[1],
+                        this.state.contentId[2],
+                        this.state.contentId[0]
+                    ];
+                } else {
+                    if (top && right) {
+                        return [
+                            this.state.contentId[1],
+                            this.state.contentId[0],
+                            this.state.contentId[2],
+                            this.state.contentId[3]
+                        ];
+                    } else {
+                        if (bottom && left) {
+                            return [
+                                this.state.contentId[2],
+                                this.state.contentId[1],
+                                this.state.contentId[0],
+                                this.state.contentId[3]
+                            ];
+                        } else {
+                            if (bottom && right) {
+                                return [
+                                    this.state.contentId[0],
+                                    this.state.contentId[1],
+                                    this.state.contentId[2],
+                                    this.state.contentId[3]
+                                ];
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+                }
             case 3:
-                return (top || left) ? [this.state.contentId[2], null, null, null]
-                    : (bottom || right) ? [this.state.contentId[0], null, null, null] : false;
+                if (top || left) {
+                    return [
+                        this.state.contentId[2],
+                        this.state.contentId[1],
+                        this.state.contentId[0],
+                        this.state.contentId[3]
+                    ];
+                } else {
+                    if (bottom || right) {
+                        return [
+                            this.state.contentId[0],
+                            this.state.contentId[1],
+                            this.state.contentId[2],
+                            this.state.contentId[3]
+                        ];
+                    } else {
+                        return false;
+                    }
+                }
             // case 4:
             // case 5:              all must return id or  false;
         }
@@ -384,7 +495,7 @@ class Layout extends Component {
             left: 0,
             right: 100,
             hiddenSplitters: '',
-            contentId: contentId,
+            contentId,
         });
 
         const {changeLayout} = this.props;
@@ -394,13 +505,25 @@ class Layout extends Component {
             tape: 100,
             cellOf1stTape: 100,
             cellOf2ndTape: 0,
-            contentId: contentId,
+            contentId: [...contentId],
         });
     }
     upTo2(types, size, sizeOfCell, contentId) {
-        const opposite = (types === 'left top') ? 'right bottom'
-            : (types === 'right bottom') ? 'left top'
-                : (types === 'left bottom') ? 'right top' : 'left bottom';
+        let opposite;
+        switch (types) {
+            case 'left top':
+                opposite = 'right bottom';
+                break;
+            case 'right bottom':
+                opposite = 'left top';
+                break;
+            case 'left bottom':
+                opposite = 'right top';
+                break;
+            case 'right top':
+                opposite = 'left bottom';
+                break;
+        }
 
         this.setState({
             ...this.state,
@@ -408,7 +531,7 @@ class Layout extends Component {
             isDragging: false,
             draggingSplitters: types,
             hiddenSplitters: opposite,
-            contentId: contentId,
+            contentId,
         });
 
         const {changeLayout} = this.props;
@@ -418,20 +541,34 @@ class Layout extends Component {
             tape: size,
             cellOf1stTape: sizeOfCell,
             cellOf2ndTape: sizeOfCell,
-            contentId: contentId,
+            contentId,
         });
     }
     upTo3(type, size, contentId) {
         const direction = (type === 'top' || type === 'bottom') ? 'column' : 'row';
-        const opposite = (type === 'top') ? 'bottom' : (type === 'bottom')
-            ? 'top' : (type === 'left') ? 'right' : 'left';
+
+        let opposite;
+        switch (type) {
+            case 'top':
+                opposite = 'bottom';
+                break;
+            case 'bottom':
+                opposite = 'top';
+                break;
+            case 'left':
+                opposite = 'right';
+                break;
+            case 'right':
+                opposite = 'left';
+                break;
+        }
 
         const splitters = {
             top: 0,
             bottom: 100,
             left: 0,
             right: 100,
-        }
+        };
         delete splitters[type];
 
         this.setState({
@@ -441,7 +578,7 @@ class Layout extends Component {
             draggingSplitters: type,
             ...splitters,
             hiddenSplitters: opposite,
-            contentId: contentId,
+            contentId,
         });
 
         const {changeLayout} = this.props;
@@ -451,7 +588,7 @@ class Layout extends Component {
             tape: size,
             cellOf1stTape: 100,
             cellOf2ndTape: 100,
-            contentId: contentId,
+            contentId,
         });
     }
 
@@ -526,6 +663,7 @@ class Layout extends Component {
         const {
             tape,
             cell,
+            content,
         } = this.props.layout;
 
         const {direction} = this.props.layout.root;
@@ -563,11 +701,11 @@ class Layout extends Component {
                     <Tape
                         type={'cell'}
                         size={cell[0].flexBasis}
-                    >{cell[0].contentId}</Tape>
+                    >{content[cell[0].contentId].id}</Tape>
                     <Tape
                         type={'cell'}
                         size={cell[1].flexBasis}
-                    >{cell[1].contentId}</Tape>
+                    >{content[cell[1].contentId].id}</Tape>
                 </Tape>
 
                 <Tape
@@ -578,11 +716,11 @@ class Layout extends Component {
                     <Tape
                         type={'cell'}
                         size={cell[2].flexBasis}
-                    >{cell[2].contentId}</Tape>
+                    >{content[cell[2].contentId].id}</Tape>
                     <Tape
                         type={'cell'}
                         size={cell[3].flexBasis}
-                    >{cell[3].contentId}</Tape>
+                    >{content[cell[3].contentId].id}</Tape>
                 </Tape>
             </LayoutComponent>
         );

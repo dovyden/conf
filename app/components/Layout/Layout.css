@@ -3,7 +3,6 @@
     display: flex;
     align-items: stretch;
     height: 100vh;
-    background: lawngreen;
 }
 
 .layout_row {
@@ -16,7 +15,6 @@
 
 .layout__tape {
     display: flex;
-    background: aqua;
 }
 
 .layout__tape_row {
@@ -40,25 +38,25 @@
 .layout__splitter_top {
     left: 0;
     right: 0;
-    height: 20px;
+    height: 4px;
 }
 
 .layout__splitter_bottom {
-    margin-top: -20px;
+    margin-top: -4px;
     left: 0;
-    height: 20px;
+    height: 4px;
     right: 0;
 }
 
 .layout__splitter_left {
     top: 0;
     bottom: 0;
-    width: 20px;
+    width: 4px;
 }
 
 .layout__splitter_right {
     top: 0;
-    margin-left: -20px;
+    margin-left: -4px;
     bottom: 0;
-    width: 20px;
+    width: 4px;
 }
