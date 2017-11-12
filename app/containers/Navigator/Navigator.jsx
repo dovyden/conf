@@ -3,18 +3,24 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 
 import {fetchNodes} from '../../actions/navigator';
-import NodesList from '../../components/Navigator/NodesList';
-import Toolbar from '../../components/Navigator/Toolbar';
+import NodesList from '../../components/Navigator/NodesList'; // eslint-disable-line
+import Toolbar from '../../components/Navigator/Toolbar'; // eslint-disable-line
 
 class Navigator extends Component {
     render() {
-        const {nodes, nodeId} = this.props;
-        const children = this.getChildren(nodeId, nodes);
-        const path = this.getPath(nodeId, nodes);
+        // const {nodes, nodeId} = this.props;
+        // const children = this.getChildren(nodeId, nodes);
+        // const path = this.getPath(nodeId, nodes);
+        // return (
+        //     <div>
+        //         <Toolbar path={path} navigateTo={this.props.navigateTo}/>
+        //         <NodesList nodes={children} navigateTo={this.props.navigateTo}/>
+        //     </div>
+        // );
         return (
             <div>
-                <Toolbar path={path} navigateTo={this.props.navigateTo}/>
-                <NodesList nodes={children} navigateTo={this.props.navigateTo}/>
+                Toolbar
+                NodesList
             </div>
         );
     }
