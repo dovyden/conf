@@ -17,5 +17,6 @@ export default function PseudoLink({className, onClick, ...props}) {
 
 PseudoLink.propTypes = {
     className: PropTypes.string,
+    children: PropTypes.any,
     onClick: PropTypes.func.isRequired
 };
