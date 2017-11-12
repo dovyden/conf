@@ -1,7 +1,6 @@
 import React from 'react';
 import logo from './images/logo.svg';
 import './App.css';
-import Document from '../../containers/Document/Document';
 
 export default function App() {
     return (
@@ -13,7 +12,6 @@ export default function App() {
             <p className="App-intro">
                 To get started, edit <code>src/components/App/App.js</code> and save to reload.
             </p>
-            <Document/>
         </div>
     );
 }

@@ -1,12 +1,14 @@
 import React, {Component} from 'react';
 import * as OpenSeadragon from 'openseadragon';
 import {Path, paper, Point} from 'paper';
+import './css/document.css';
 import PropTypes from 'prop-types';
+import {zoomPerScroll, noZoom} from './../../constants/document';
 
 export default class DocumentView extends Component {
     componentDidMount() {
         const idMarks = `paperCanvas${this.props.idDocument.toString()}`;
-        paper.setup(idMarks);
+        this.paper = paper.setup(idMarks);
 
         const targetElement = document.getElementById(idMarks);
         this.left = targetElement.getBoundingClientRect().left;
@@ -23,16 +25,11 @@ export default class DocumentView extends Component {
             id: idDocument,
             showNavigationControl: false,
             gestureSettingsMouse: {clickToZoom: false},
-            showNavigator: false,
-            zoomPerScroll: 0.75,
-            debugMode: false,
-            visibilityRatio: 0.9,
-            // minZoomLevel: 1,
-            // maxZoomLevel: 6,
+            zoomPerScroll,
+            visibilityRatio: 0,
             constrainDuringPan: true,
             tileSources: 'https://test.knevod.com/static/tile/_test/4H/4H@test.knevod.com/330/0/tiles.dzi'
         });
-
         this.connectOSDWithPaper();
     }
 
@@ -40,8 +37,9 @@ export default class DocumentView extends Component {
         const oldBounds = this.viewer.viewport.getBounds(true);
         const newBounds = new OpenSeadragon.Rect(0, 0, 1, oldBounds.height / oldBounds.width);
         this.viewer.viewport.fitBounds(newBounds, true);
-        this.viewer.viewport.zoomTo(3, true);
-        this.currentZoom = 3;
+        this.viewer.viewport.zoomTo(2, true);
+        this.currentZoom = 2;
+        // console.log(this.viewer.source);
         // TODO: method who redraw marks with newBounds and zoom
     }
 
@@ -68,7 +66,7 @@ export default class DocumentView extends Component {
         this.flagMouseDownForPaper = true;
         this.viewer.panVertical = false;
         this.viewer.panHorizontal = false;
-        this.viewer.zoomPerScroll = 1; // forbid zoom
+        this.viewer.zoomPerScroll = noZoom;
         const x = event.position.x;
         const y = event.position.y;
         this.marks[this.countOfMarks] = {
@@ -92,10 +90,8 @@ export default class DocumentView extends Component {
             this.marks[this.countOfMarks].path.add(new Point(x, y));
         } else if (this.countOfMarks) {
             /**
-             * TODO: when there is no pan because of the fact that the drawing gets on the screen,
-             * the marks should not move
+             * TODO: bug with zoom
              */
-            // TODO: do only one translate when drag is over(optimization)
             const delta = event.delta;
             this.marks.forEach((item) => {
                 item.path.translate(new Point(delta.x, delta.y));
@@ -108,22 +104,22 @@ export default class DocumentView extends Component {
             this.marks[this.countOfMarks].bound = this.viewer.viewport.getBounds(true);
             this.marks[this.countOfMarks].zoom = this.viewer.viewport.getZoom(true);
             this.countOfMarks++;
-            // const copy = this.marks[0].path.clone();
-            // copy.strokeColor = 'orange';
         }
         this.flagMouseDownForPaper = false;
 
         event.preventDefaultAction = false;
         this.viewer.panVertical = true;
         this.viewer.panHorizontal = true;
-        this.viewer.zoomPerScroll = 0.75; // allow zoom
+        this.viewer.zoomPerScroll = zoomPerScroll; // allow zoom
     }
 
     onZoom(event) {
         if (!this.countOfMarks || this.flagMouseDownForPaper) {
             return;
         }
-
+        /**
+         * TODO: bug with zoom
+         */
         const currentZoom = event.zoom;
         const newZoom = currentZoom / this.currentZoom;
         const newCenter = this.viewer.viewport.viewportToViewerElementCoordinates(event.refPoint, true);
@@ -133,6 +129,7 @@ export default class DocumentView extends Component {
         });
 
         this.currentZoom = currentZoom;
+
     }
 
     render() {
