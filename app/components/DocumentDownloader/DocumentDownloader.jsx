@@ -1,51 +1,43 @@
-import React from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import b_ from 'b_';
+
 import './DocumentDownloader.css';
-import LinksDocumentDownloader from './LinksDocumentDownloader.jsx';
+import LinksDocumentDownloader from './ContentDocumentDownloader.jsx';
 
-export default function DocumentDownloader(props) {
-    const inLinks = [
-        {text: 'Версия 1'},
-        {text: 'Версия 2'},
-        {text: 'Версия 3'}
-    ];
+const b = b_.lock('document-downloader');
 
-    function recount() {
-        document.getElementById(`box${props.id}`).style.left
-            = `${String(document.getElementById(`a${props.id}`).getBoundingClientRect().left
-                - document.getElementById(`box${props.id}`).getBoundingClientRect().width / 2
-                + document.getElementById(`a${props.id}`).getBoundingClientRect().width / 2)}px`;
+export default class DocumentDownloader extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {status: false};
+        this.show = this.show.bind(this);
+        this.stop = this.stop.bind(this);
     }
 
-    function show(e) {
+    show() {
+        this.setState({status: !this.state.status});
+    }
+
+    stop(e) {
         e.preventDefault();
-        const display = document.getElementById(`box${props.id}`).style.display;
-        if (display === 'none') {
-            document.getElementById(`box${props.id}`).style.display = 'block';
-            document.getElementById(`a${props.id}`).style.color = 'red';
-        } else {
-            document.getElementById(`box${props.id}`).style.display = 'none';
-            document.getElementById(`a${props.id}`).style.color = 'blue';
-        }
-        recount();
     }
 
-    return (
-        <div className="DocumentDownloader" style={{position: 'relative'}}>
-            <a href="#" id={`a${props.id}`} type="submit" onClick={show} style={{color: 'blue'}}>{props.linkName}</a>
-            <div id = {`box${props.id}`} className="box" style={{display: 'none'}}>
-                <svg className="poligon" width="16px" height="8px" >
-                    <polygon points="0,8 8,0 16,8" fill="black" />
-                </svg>
-                <div className="boxWithText">
-                    <LinksDocumentDownloader text={inLinks}/>
+    render() {
+        return (
+            <div className="document-downloader" onClick={this.stop}>
+                <span className={b(`knob`, {active: this.state.status})}
+                    onClick={this.show}>{this.props.linkName}</span>
+                <div className={b(`big-box`, {shown: this.state.status})}>
+                    <div className="document-downloader__triangle"/>
+                    <LinksDocumentDownloader content={this.props.content}/>
                 </div>
             </div>
-        </div>
-    );
+        );
+    }
 }
 
 DocumentDownloader.propTypes = {
-    id: PropTypes.string.isRequired,
-    linkName: PropTypes.string.isRequired
+    linkName: PropTypes.string.isRequired,
+    content: PropTypes.array.isRequired
 };
