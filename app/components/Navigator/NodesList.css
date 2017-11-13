@@ -2,12 +2,12 @@
     width: 100%;
     border-spacing: 0;
     border-collapse: collapse;
-    height: 100%;
+    height: calc(100% - 70px);
 }
 
 .nodes-list__nodes {
     display: block;
-    height: 200px;
+    height: 100%;
     overflow: auto;
 }
 
