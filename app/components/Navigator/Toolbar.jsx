@@ -13,7 +13,7 @@ export default function Toolbar(props) {
                 <span
                     className={b('text', {'previous-nodes': true})}
                     onClick={() => {
-                        props.navigateTo({type: 'node', nodeId: null});
+                        props.navigateTo({type: 'navigator', contentId: ''});
                     }}
                 >
                     ⌂
@@ -33,7 +33,7 @@ export default function Toolbar(props) {
                             <span
                                 className={className}
                                 onClick={() => {
-                                    props.navigateTo({type: 'node', nodeId: node.nodeId});
+                                    props.navigateTo({type: 'navigator', contentId: node.nodeId});
                                 }}
                             >
                                 {node.name}

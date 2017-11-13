@@ -20,7 +20,7 @@ export default function NodesList(props) {
                     </th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody className={b('nodes')}>
                 {Object.keys(props.nodes).map((nodeId) => {
                     return (
                         <Node
