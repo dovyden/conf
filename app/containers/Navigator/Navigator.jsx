@@ -30,7 +30,7 @@ class Navigator extends Component {
             path = this.getPath(nodeId, nodes);
         }
         return (
-            <div>
+            <div style={{width: '100%', height: '100%', display: 'block'}}>
                 <Toolbar path={path} navigateTo={this.props.navigateTo}/>
                 <NodesList nodes={children} navigateTo={this.props.navigateTo}/>
             </div>
