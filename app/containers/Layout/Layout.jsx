@@ -658,7 +658,7 @@ class Layout extends Component {
         }
     }
 
-    navigate(id, type, contentId) {
+    navigate(id, {type, contentId}) {
         const {navigateTo} = this.props;
 
         const {cell} = this.props.layout;
