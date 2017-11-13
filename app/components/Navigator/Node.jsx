@@ -30,10 +30,7 @@ class Node extends Component {
     }
 
     navigateTo() {
-        this.props.navigateTo({
-            type: 'node',
-            nodeId: this.props.nodeId
-        });
+        this.props.navigateTo({type: 'navigator', contentId: this.props.nodeId});
     }
 }
 

@@ -19,7 +19,7 @@ const deserialize = (json) => {
     return result;
 };
 
-export const fetchNodes = ({nodes, query, attrs = DEFAULT_NODE_ATTRS}) => {
+export const fetchNodes = ({nodes, query, attrs = DEFAULT_NODE_ATTRS, fetchRoot = false, downloadChildrenId}) => {
     return (dispatch) => {
         fetchApi('node/SEARCH', {body: {
             nodes,
@@ -31,7 +31,7 @@ export const fetchNodes = ({nodes, query, attrs = DEFAULT_NODE_ATTRS}) => {
             (json) => {
                 dispatch({
                     type: STORE_NODES,
-                    payload: deserialize(json)
+                    payload: {nodes: deserialize(json), fetchRoot, downloadChildrenId}
                 });
             }
         );
