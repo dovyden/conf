@@ -10,9 +10,10 @@ import thunk from 'redux-thunk';
 
 import {load as loadFromStorage} from './localStorage';
 import reducers from '../reducers';
+import {socketMiddleware} from '../websocket';
 
 // add middlewares to redux store
-const middlewares = [thunk];
+const middlewares = [thunk, socketMiddleware];
 
 if (process.env.NODE_ENV === 'development') {
     middlewares.push(logger({
