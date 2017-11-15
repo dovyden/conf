@@ -2,6 +2,7 @@
 
 const express = require('express');
 const config = require('./libs/config');
+const DataProvider = require('./libs/data-provider');
 const logger = require('./libs/logger');
 
 const Storage = require('./libs/storage');
@@ -42,7 +43,9 @@ const workerLogger = logger({namespace: 'Worker'});
 
 const storage = new Storage();
 
-try {
+// init voximplant
+DataProvider.dataProvider('voximplant').getApiKey().then(() => {
+    // configure app
     configure(app);
     useMiddlewares(app);
 
@@ -75,7 +78,7 @@ try {
     // init websockets
     require('./websocket')(server);
 
-} catch (ex) {
+}).catch(ex => {
     workerLogger.error(`Configuring worker (${process.pid}) error: ${ex.stack}`);
     process.exit(1);
-}
+});

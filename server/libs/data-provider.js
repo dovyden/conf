@@ -2,19 +2,19 @@
 
 const logger = require('../libs/logger');
 
+const CACHE = Object.create(null);
+
 
 class DataProvider {
     /**
      * DataProvider constructor
      *
      * @constructor
-     * @param {Express.Request} req
      * @param {string} name
      */
-    constructor(req, name) {
-        this._req = req;
+    constructor(name) {
         this._name = name;
-        this._logger = logger(req, `dataprovider:${name}`);
+        this._logger = logger({namespace: `DataProvider:${name}`});
     }
 
     /**
@@ -23,8 +23,15 @@ class DataProvider {
      * @param {string} name
      * @return {DataProvider}
      */
-    dataProvider(name) {
-        return this._req.dataProvider(name);
+    static dataProvider(name) {
+        if (CACHE[name]) {
+            return CACHE[name];
+        }
+
+        const DataProvider = require(`../data-providers/${name}`);
+        CACHE[name] = new DataProvider(name);
+
+        return CACHE[name];
     }
 }
 
