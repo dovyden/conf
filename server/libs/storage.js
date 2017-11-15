@@ -6,48 +6,36 @@ class Storage {
             return Storage.instance;
         }
 
-        this.obj = {};
+        this.data = {};
 
         Storage.instance = this;
     }
 
-    put(key, data) {
-        if (!this.obj[key]) {
-            this.obj[key] = [];
-        }
+    setItem(key, value) {
+        this.data[key] = value;
 
-        this.obj[key].push(data);
-    }
-
-    getAll(key) {
-        return this.obj[key] ? this.obj[key] : null;
-    }
-
-    get(key, field, value) {
-        for (let i = 0; i < this.obj[key].length; i++) {
-            if (this.obj[key][i][field] === value) {
-                return this.obj[key][i];
+        process.send({
+            type: 'setItem',
+            payload: {
+                key,
+                value
             }
-        }
-
-        return null;
+        });
     }
 
-    removeAll(key) {
-        delete this.obj[key];
+    getItem(key) {
+        return this.data[key];
     }
 
-    remove(key, field, value) {
-        for (let i = 0; i < this.obj[key].length; i++) {
-            if (this.obj[key][i][field] === value) {
-                delete this.obj[key][i];
-                return;
+    removeItem(key) {
+        delete this.data[key];
+
+        process.send({
+            type: 'removeItem',
+            payload: {
+                key
             }
-        }
-    }
-
-    clear() {
-        this.obj = {};
+        });
     }
 }
 
