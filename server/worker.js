@@ -4,6 +4,7 @@ const express = require('express');
 const config = require('./libs/config');
 const logger = require('./libs/logger');
 
+const Storage = require('./libs/storage');
 
 // app
 function configure(app) {
@@ -39,6 +40,8 @@ require('./libs/express-extensions');
 const app = express();
 const workerLogger = logger({namespace: 'Worker'});
 
+const storage = new Storage();
+
 try {
     configure(app);
     useMiddlewares(app);
@@ -46,6 +49,12 @@ try {
     // listen messages from master
     process.on('message', ({type, payload}) => {
         switch (type) {
+            case 'setItem':
+                storage.setItem(payload.key, payload.value);
+                break;
+            case 'removeItem':
+                storage.removeItem(payload.key);
+                break;
             case 'EXAMPLE_UPDATE_DATA':
                 workerLogger.log(`Worker (${process.pid}) got message: ${type}: ${payload}`);
                 break;

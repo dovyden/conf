@@ -14,6 +14,8 @@ if (cluster.isMaster) {
         const {type, payload} = message;
 
         switch (type) {
+            case 'setItem':
+            case 'removeItem':
             case 'EXAMPLE_UPDATE_DATA':
                 masterLogger.info(`Message from worker (${worker.process.pid}): ${type}: ${payload}`);
 
