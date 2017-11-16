@@ -60,12 +60,6 @@ class HttpDataProvider extends DataProvider {
         // custom headers
         const headers = {};
 
-        if (this._req.headers['x-forwarded-for'] || this._req.headers['x-real-ip'] || this._req.ip) {
-            headers['x-forwarded-for'] = this._req.headers['x-forwarded-for'] ||
-                this._req.headers['x-real-ip'] ||
-                this._req.ip;
-        }
-
         // handle cookies
         if (params.cookie && Object.keys(params.cookie).length) {
             headers.cookie = querystring.stringify(params.cookie, '; ', '=');

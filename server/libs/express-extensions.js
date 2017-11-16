@@ -3,6 +3,7 @@
 const crypto = require('crypto');
 const os = require('os');
 const express = require('express');
+const DataProvider = require('./data-provider');
 const logger = require('./logger');
 
 
@@ -34,16 +35,7 @@ express.request.getRequestId = (() => {
  * @return {DataProvider}
  */
 express.request.dataProvider = function dataProvider(name) {
-    this._dataProviders = this._dataProviders || {};
-
-    if (this._dataProviders[name]) {
-        return this._dataProviders[name];
-    }
-
-    const DataProvider = require(`../data-providers/${name}`);
-    this._dataProviders[name] = new DataProvider(this);
-
-    return this._dataProviders[name];
+    return DataProvider.dataProvider(name);
 };
 
 /**
