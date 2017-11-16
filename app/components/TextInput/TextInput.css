@@ -1,0 +1,13 @@
+.textinput {
+    font: bold 14px Arial;
+    text-align: left;
+    color: #000;
+    border-radius: 5px;
+    background-color: #fff;
+    padding: 7px;
+    border: solid 1px #d9d9d9;
+}
+
+.textinput::placeholder {
+    font-weight: normal;
+}
