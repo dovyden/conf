@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 export default function Navigator(props) {
     return (
-        <div onClick={props.navigateTo()}>
+        <div onClick={() => props.navigateTo('navigator', props.nodeId)}>
             {props.nodeId}
             {props.scroll}
         </div>
