@@ -79,6 +79,7 @@
     "lint": "npm run lint:js",
     "lint:css": "./node_modules/.bin/stylelint app/**/*.css",
     "lint:js": "./node_modules/.bin/eslint --ext .js --ext .jsx app/ tools/",
+    "lint:js:fix": "./node_modules/.bin/eslint --ext .js --ext .jsx app/ tools/ --fix",
     "ncu": "./node_modules/.bin/ncu --packageFile ./package.json",
     "server": "node server/server.js",
     "start": "npm run watch:app && npm run watch:server",
@@ -91,7 +92,6 @@
     "node": ">=8.9"
   },
   "pre-commit": [
-    "lint",
-    "test"
+    "lint"
   ]
 }
