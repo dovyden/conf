@@ -1,0 +1,10 @@
+.pseudolink {
+    text-decoration: none;
+    border-bottom: 1px dashed #4990e2;
+    font: 14px Arial;
+    color: #4990e2;
+}
+
+.pseudolink:hover {
+    cursor: pointer;
+}
