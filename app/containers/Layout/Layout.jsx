@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import {changeLayout, navigateTo} from '../../actions/layout';
 import LayoutComponent from '../../components/Layout/Layout';
-import Navigator from '../Navigator/Navigator';
+// import Navigator from '../Navigator/Navigator';
 import Tape from '../../components/Layout/Tape';
 import Splitter from '../../components/Layout/Splitter';
 import Box from '../../components/Layout/Box';
@@ -34,9 +34,9 @@ class Layout extends Component {
 
             // [X, Y, visibility, jointHorizontal, jointVertical]
             box1st: [0, 0, true, 'top', 'left'],
-            box2nd: [0, 100, true, 'bottom', 'right'],
-            box3rd: [100, 0, true, 'bottom', 'left'],
-            box4th: [100, 100, true, 'top', 'right'],
+            box2nd: [0, 100, true, 'bottom', 'left'],
+            box3rd: [100, 0, true, 'top', 'right'],
+            box4th: [100, 100, true, 'bottom', 'right'],
 
             top: [0, 100, true],            // [position, size, visibility]
             bottom: [100, 100, true],
@@ -54,10 +54,10 @@ class Layout extends Component {
         this.mouseDownLine = this.mouseDownLine.bind(this);
 
         // Navigate func binding
-        this.navigateTo1stCell = this.navigate.bind(this, 0);
-        this.navigateTo2ndCell = this.navigate.bind(this, 1);
-        this.navigateTo3rdCell = this.navigate.bind(this, 2);
-        this.navigateTo4thCell = this.navigate.bind(this, 3);
+        // this.navigateTo1stCell = this.navigate.bind(this, 0);
+        // this.navigateTo2ndCell = this.navigate.bind(this, 1);
+        // this.navigateTo3rdCell = this.navigate.bind(this, 2);
+        // this.navigateTo4thCell = this.navigate.bind(this, 3);
     }
 
     componentDidMount() {
@@ -95,7 +95,10 @@ class Layout extends Component {
                 this.downTo5();
                 break;
 
-            case 'box1st':                      // dragging box, only 1
+            case 'box1st':                              // dragging box
+            case 'box2nd':
+            case 'box3rd':
+            case 'box4th':
                 this.downTo2(e, e.target.dataset.type);
                 break;
         }
@@ -106,13 +109,17 @@ class Layout extends Component {
             case 'bottom':
             case 'left':
             case 'right':
-                if (this.state[e.target.dataset.type][1] === 100) {         // [1]-size
+                if (this.state[e.target.dataset.type][1] === 100) {         // [1] - size
                     this.downTo3(e, e.target.dataset.type);
+                } else {
+                    this.downTo4();
                 }
                 break;
 
             case 'box1st':                      // dragging box
             case 'box2nd':
+            case 'box3rd':
+            case 'box4th':
                 this.downTo4();
                 break;
         }
@@ -124,13 +131,15 @@ class Layout extends Component {
     downTo2(e, draggingElement) {               // исправить
         const {contentId} = this.state;
 
+        const top = [...this.state.top];
+        const left = [...this.state.left];
+        const bottom = [...this.state.bottom];
+        const right = [...this.state.right];
+
         const box1st = [...this.state.box1st];
         const box2nd = [...this.state.box2nd];
         const box3rd = [...this.state.box3rd];
         const box4th = [...this.state.box4th];
-        box2nd[2] = false;                      // hidden boxes
-        box3rd[2] = false;
-        box4th[2] = false;
 
         let newContentId = [];
         switch (this.state.currentState) {
@@ -138,18 +147,23 @@ class Layout extends Component {
                 switch (draggingElement) {
                     case 'box1st':
                         newContentId = [contentId[3], contentId[1], contentId[2], contentId[0]];
+                        box2nd[2] = false; box3rd[2] = false; box4th[2] = false;    // hidden boxes
+                        bottom[2] = false; right[2] = false;                        // hidden splitters
                         break;
                     case 'box2nd':
                         newContentId = [contentId[2], contentId[1], contentId[0], contentId[3]];
-                        box1st[0] = box2nd[0]; box1st[1] = box2nd[1];
+                        box1st[2] = false; box3rd[2] = false; box4th[2] = false;    // hidden boxes
+                        top[2] = false; right[2] = false;                           // hidden splitters
                         break;
                     case 'box3rd':
                         newContentId = [contentId[1], contentId[0], contentId[2], contentId[3]];
-                        box1st[0] = box3rd[0]; box1st[1] = box3rd[1];
+                        box2nd[2] = false; box1st[2] = false; box4th[2] = false;    // hidden boxes
+                        bottom[2] = false; left[2] = false;                         // hidden splitters
                         break;
                     case 'box4th':
                         newContentId = [contentId[0], contentId[1], contentId[2], contentId[3]];
-                        box1st[0] = box4th[0]; box1st[1] = box4th[1];
+                        box2nd[2] = false; box3rd[2] = false; box1st[2] = false;    // hidden boxes
+                        top[2] = false; left[2] = false;                            // hidden splitters
                         break;
                 }
                 break;
@@ -158,11 +172,6 @@ class Layout extends Component {
                 break;
         }
 
-        const bottom = [...this.state.bottom];
-        const right = [...this.state.right];
-        bottom[2] = false;                      // hidden splitters
-        right[2] = false;
-
         this.setState({
             ...this.state,
             currentState: 2,
@@ -170,6 +179,8 @@ class Layout extends Component {
             isDragging: true,
             contentId: newContentId,
 
+            top,
+            left,
             bottom,
             right,
 
@@ -184,7 +195,7 @@ class Layout extends Component {
             offsetY: e.clientY - this.state[draggingElement][1] * e.target.parentElement.clientHeight / 100, // [1]-Y
         });
     }
-    downTo3(e, type) {                                  // исправить
+    downTo3(e, type) {                                  // draggingElement = type
         const {contentId} = this.state;
 
         const top = [...this.state.top];
@@ -197,63 +208,44 @@ class Layout extends Component {
         const box3rd = [...this.state.box3rd];
         const box4th = [...this.state.box4th];
 
+        box1st[2] = false; box2nd[2] = false; box3rd[2] = false; box4th[2] = false; // hidden boxes
+
+        let offset = [];
         let newContentId = [];                          // for cells' content
         switch (this.state.currentState) {
             case 1:
                 newContentId = (type === 'top' || type === 'left')
                     ? [contentId[2], contentId[1], contentId[0], contentId[3]]
                     : [contentId[0], contentId[1], contentId[2], contentId[3]];
-                switch (type) {
-                    case 'top':
-                        left[2] = false; bottom[2] = false; right[2] = false;   // hidden splitters
-                        break;
-                    case 'bottom':
-                        left[2] = false; top[2] = false; right[2] = false;      // hidden splitters
-                        break;
-                    case 'left':
-                        top[2] = false; bottom[2] = false; right[2] = false;    // hidden splitters
-                        break;
-                    case 'right':
-                        left[2] = false; bottom[2] = false; top[2] = false;     // hidden splitters
-                        break;
-                }
                 break;
             case 3:
                 newContentId = this.state.contentId;
                 break;
         }
 
-        let draggingElement = '';
-        let offset = [];
-
-        if (type === 'top' || type === 'bottom') {          // choice dragging splitter
-            draggingElement = 'top';
-            left[2] = false;                                // hidden left
-            offset = [0, e.clientY - this.state[type][0] * e.target.parentElement.clientHeight / 100]; // Y
-            box2nd[3] = 'top'; box2nd[4] = 'right';         // set jointSplitters
-            if (type === 'bottom') {
-                top[0] = bottom[0];
-            }
-        } else {
-            draggingElement = 'left';
-            top[2] = false;
-            offset = [e.clientX - this.state[type][0] * e.target.parentElement.clientWidth / 100, 0];  // X
-            box2nd[3] = 'bottom'; box2nd[4] = 'right';
-            if (type === 'right') {
-                left[0] = right[0];
-            }
+        switch (type) {
+            case 'top':
+                left[2] = false; bottom[2] = false; right[2] = false;   // hidden splitters
+                offset = [0, e.clientY - this.state[type][0] * e.target.parentElement.clientHeight / 100]; // Y
+                break;
+            case 'bottom':
+                left[2] = false; top[2] = false; right[2] = false;      // hidden splitters
+                offset = [0, e.clientY - this.state[type][0] * e.target.parentElement.clientHeight / 100]; // Y
+                break;
+            case 'left':
+                top[2] = false; bottom[2] = false; right[2] = false;    // hidden splitters
+                offset = [e.clientX - this.state[type][0] * e.target.parentElement.clientWidth / 100, 0];  // X
+                break;
+            case 'right':
+                left[2] = false; bottom[2] = false; top[2] = false;     // hidden splitters
+                offset = [e.clientX - this.state[type][0] * e.target.parentElement.clientWidth / 100, 0];  // X
+                break;
         }
-
-        bottom[2] = false; right[2] = false;                // default hidden splitters
-
-        box3rd[2] = false; box4th[2] = false;               // default hidden boxes
-
-        box1st[3] = 'top'; box1st[4] = 'left';              // always same jointSplitters
 
         this.setState({
             ...this.state,
             currentState: 3,
-            draggingElement,
+            draggingElement: type,
             isDragging: true,
             contentId: newContentId,
 
@@ -284,25 +276,25 @@ class Layout extends Component {
 
         // check border
 
-        const box1st = [...this.state.box1st];
-        box1st[0] = coordinates[0];     // [0]-X
-        box1st[1] = coordinates[1];     // [1]-Y
+        const box = [...this.state[this.state.draggingElement]];
+        box[0] = coordinates[0];     // [0]-X
+        box[1] = coordinates[1];     // [1]-Y
 
-        const top = [...this.state.top];
-        top[0] = coordinates[1];        // [1]-Y
+        const horizontal = [...this.state[box[3]]];
+        const vertical = [...this.state[box[4]]];
 
-        const left = [...this.state.left];
-        left[0] = coordinates[0];       // [0]-X
+        horizontal[0] = box[1];
+        vertical[0] = box[0];
 
         this.setState({
             ...this.state,
-            top,
-            left,
-            box1st,
+            [this.state.draggingElement]: box,              // dragging box
+            [box[3]]: horizontal,                           // horizontal
+            [box[4]]: vertical,                             // vertical
         });
     }
     move3(e) {
-        const coordinates = (this.state.draggingElement === 'top')
+        const coordinates = (this.state.draggingElement === 'top' || this.state.draggingElement === 'bottom')
             ? (e.clientY - this.state.offsetY) / this.state.parentHeight * 100
             : (e.clientX - this.state.offsetX) / this.state.parentWidth * 100;
 
@@ -311,19 +303,9 @@ class Layout extends Component {
         const draggingElement = [...this.state[this.state.draggingElement]];
         draggingElement[0] = coordinates;
 
-        // const box1st = [...this.state.box1st];
-        // box1st[0] = coordinates[0];  // [0]-X
-        // box1st[1] = coordinates[1];  // [1]-Y
-        //
-        // const box2nd = [...this.state.box1st];
-        // box2nd[0] = coordinates[0];  // [0]-X
-        // box2nd[1] = coordinates[1];  // [1]-Y
-
         this.setState({
             ...this.state,
             [this.state.draggingElement]: draggingElement,
-            // box1st,
-            // box2nd,
         });
     }
 
@@ -343,7 +325,8 @@ class Layout extends Component {
             if (right) {
                 return this.upTo1([contentId[1], contentId[0], contentId[2], contentId[3]]);
             }
-            return this.upTo3('left', [contentId[1], contentId[0], contentId[3], contentId[2]]);
+            return this.upTo3(this.state[this.state.draggingElement][4],
+                [contentId[1], contentId[0], contentId[3], contentId[2]]);
         }
         if (bottom) {
             if (left) {
@@ -352,13 +335,16 @@ class Layout extends Component {
             if (right) {
                 return this.upTo1([contentId[0], contentId[1], contentId[2], contentId[3]]);
             }
-            return this.upTo3('left', [contentId[0], contentId[1], contentId[2], contentId[3]]);
+            return this.upTo3(this.state[this.state.draggingElement][4],
+                [contentId[0], contentId[1], contentId[2], contentId[3]]);
         }
         if (left) {
-            return this.upTo3('top', [contentId[2], contentId[1], contentId[3], contentId[0]]);
+            return this.upTo3(this.state[this.state.draggingElement][3],
+                [contentId[2], contentId[1], contentId[3], contentId[0]]);
         }
         if (right) {
-            return this.upTo3('top', [contentId[0], contentId[2], contentId[1], contentId[3]]);
+            return this.upTo3(this.state[this.state.draggingElement][3],
+                [contentId[0], contentId[2], contentId[1], contentId[3]]);
         }
         return this.upTo2(this.state.contentId);
     }
@@ -370,12 +356,22 @@ class Layout extends Component {
         const left = (e.clientX < this.state.minSizeOfCell);
         const right = (e.clientX > this.state.parentWidth - this.state.minSizeOfCell);
 
-        if (top || left) {
-            return this.upTo1([contentId[2], contentId[1], contentId[0], contentId[3]]);
+        if (this.state.draggingElement === 'top' || this.state.draggingElement === 'bottom') {
+            if (top) {
+                return this.upTo1([contentId[2], contentId[1], contentId[0], contentId[3]]);
+            }
+            if (bottom) {
+                return this.upTo1([contentId[0], contentId[1], contentId[2], contentId[3]]);
+            }
+        } else {
+            if (left) {
+                return this.upTo1([contentId[2], contentId[1], contentId[0], contentId[3]]);
+            }
+            if (right) {
+                return this.upTo1([contentId[0], contentId[1], contentId[2], contentId[3]]);
+            }
         }
-        if (bottom || right) {
-            return this.upTo1([contentId[0], contentId[1], contentId[2], contentId[3]]);
-        }
+
         return this.upTo3(this.state.draggingElement, this.state.contentId);
     }
 
@@ -390,9 +386,9 @@ class Layout extends Component {
             contentId,
 
             box1st: [0, 0, true, 'top', 'left'],
-            box2nd: [0, 100, true, 'bottom', 'right'],
-            box3rd: [100, 0, true, 'bottom', 'left'],
-            box4th: [100, 100, true, 'top', 'right'],
+            box2nd: [0, 100, true, 'bottom', 'left'],
+            box3rd: [100, 0, true, 'top', 'right'],
+            box4th: [100, 100, true, 'bottom', 'right'],
 
             top: [0, 100, true],
             bottom: [100, 100, true],
@@ -411,6 +407,7 @@ class Layout extends Component {
         });
     }
     upTo2(contentId) {
+        const box = [...this.state[this.state.draggingElement]];
         this.setState({
             ...this.state,
             currentState: 2,
@@ -418,51 +415,74 @@ class Layout extends Component {
             draggingElement: '',
             isDragging: false,
             contentId,
-
-            box1st: [this.state.left[0], this.state.top[0], true, 'top', 'left'],
-            box2nd: [0, 100, false, 'bottom', 'right'],
-            box3rd: [100, 0, false, 'bottom', 'left'],
-            box4th: [100, 100, false, 'top', 'right'],
-
-            bottom: [100, 100, false],
-            right: [100, 100, false],
         });
 
         const {changeLayout} = this.props;
         changeLayout({
             stateId: 2,
             direction: 'row',
-            tape: this.state.left[0],
-            cellOf1stTape: this.state.top[0],
-            cellOf2ndTape: this.state.top[0],
+            tape: box[0],
+            cellOf1stTape: box[1],
+            cellOf2ndTape: box[1],
             contentId,
         });
     }
-    upTo3(draggingElement, contentId) {     // draggingElement - the only splitter
-        let left = []; let top = [];        // for splitters
-        let box1st = []; let box2nd = [];   // for boxes
-        let direction; let size;
+    upTo3(draggingElement, contentId) {
+        const top = [...this.state.top];
+        const left = [...this.state.left];
+        const bottom = [...this.state.bottom];
+        const right = [...this.state.right];
 
-        if (draggingElement === 'top') {                // choice of dragging splitter
-            direction = 'column';
-            size = this.state.top[0];
+        const box1st = [...this.state.box1st];
+        const box2nd = [...this.state.box2nd];
+        const box3rd = [...this.state.box3rd];
+        const box4th = [...this.state.box4th];
 
-            box1st = [0, this.state.top[0], true, 'top', 'left'];
-            box2nd = [100, this.state.top[0], true, 'top', 'right'];
+        let direction;
+        switch (draggingElement) {
+            case 'top':
+                bottom[2] = false; left[2] = true; right[2] = true;
+                box2nd[2] = false; box4th[2] = false; box1st[2] = true; box3rd[2] = true;
 
-            top = [...this.state.top];
-            left = [0, 100, false];
-        } else {
-            direction = 'row';
-            size = this.state.left[0];
+                bottom[0] = 100; left[0] = 0; right[0] = 100;
+                box1st[1] = top[0]; box1st[0] = 0;
+                box3rd[1] = top[0]; box3rd[0] = 100;
 
-            box1st = [this.state.left[0], 0, true, 'top', 'left'];
-            box2nd = [this.state.left[0], 100, true, 'bottom', 'left'];
+                direction = 'column';
+                break;
+            case 'bottom':
+                top[2] = false; left[2] = true; right[2] = true;
+                box1st[2] = false; box3rd[2] = false; box2nd[2] = true; box4th[2] = true;
 
-            left = [...this.state.left];
-            top = [0, 100, false];
+                top[0] = 0; left[0] = 0; right[0] = 100;
+                box2nd[1] = bottom[0]; box2nd[0] = 0;
+                box4th[1] = bottom[0]; box4th[0] = 100;
+
+                direction = 'column';
+                break;
+            case 'left':
+                right[2] = false; top[2] = true; bottom[2] = true;
+                box3rd[2] = false; box4th[2] = false; box1st[2] = true; box2nd[2] = true;
+
+                top[0] = 0; bottom[0] = 100; right[0] = 100;
+                box1st[1] = 0; box1st[0] = left[0];
+                box2nd[1] = 100; box2nd[0] = left[0];
+
+                direction = 'row';
+                break;
+            case 'right':
+                left[2] = false; top[2] = true; bottom[2] = true;
+                box1st[2] = false; box2nd[2] = false; box3rd[2] = true; box4th[2] = true;
+
+                top[0] = 0; bottom[0] = 100; left[0] = 0;
+                box3rd[1] = 0; box3rd[0] = right[0];
+                box4th[1] = 100; box4th[0] = right[0];
+
+                direction = 'row';
+                break;
         }
 
+        const size = this.state[draggingElement][0];
         this.setState({
             ...this.state,
             currentState: 3,
@@ -471,15 +491,15 @@ class Layout extends Component {
             isDragging: false,
             contentId,
 
+            top,
+            left,
+            bottom,
+            right,
+
             box1st,
             box2nd,
-            box3rd: [100, 0, false, 'bottom', 'left'],
-            box4th: [100, 100, false, 'top', 'right'],
-
-            top,
-            bottom: [100, 100, false],
-            left,
-            right: [100, 100, false],
+            box3rd,
+            box4th,
         });
 
         const {changeLayout} = this.props;
@@ -552,14 +572,14 @@ class Layout extends Component {
         }
     }
 
-    navigate(id, {type, contentId}) {
-        const {navigateTo} = this.props;
-
-        const {cell} = this.props.layout;
-        const cellId = cell[id].contentId;
-
-        navigateTo({type, cellId, contentId});
-    }
+    // navigate(id, {type, contentId}) {
+    //     const {navigateTo} = this.props;
+    //
+    //     const {cell} = this.props.layout;
+    //     const cellId = cell[id].contentId;
+    //
+    //     navigateTo({type, cellId, contentId});
+    // }
 
     render() {
         const {
@@ -567,6 +587,7 @@ class Layout extends Component {
             bottom,
             left,
             right,
+
             box1st,
             box2nd,
             box3rd,
@@ -576,7 +597,7 @@ class Layout extends Component {
         const {
             tape,
             cell,
-            content
+            // content
         } = this.props.layout;
 
         const {direction} = this.props.layout.root;
@@ -597,19 +618,19 @@ class Layout extends Component {
 
                 <Tape type={'tape'} direction={cellDirection} size={tape[0]}>
                     <Tape type={'cell'} size={cell[0].flexBasis}>
-                        <Navigator navigateTo={this.navigateTo1stCell} nodeId={content[cell[0].contentId].id}/>
+                        {'navigator1'}
                     </Tape>
                     <Tape type={'cell'} size={cell[1].flexBasis}>
-                        <Navigator navigateTo={this.navigateTo2ndCell} nodeId={content[cell[1].contentId].id}/>
+                        {'navigator2'}
                     </Tape>
                 </Tape>
 
                 <Tape type={'tape'} direction={cellDirection} size={tape[1]}>
                     <Tape type={'cell'} size={cell[2].flexBasis}>
-                        <Navigator navigateTo={this.navigateTo3rdCell} nodeId={content[cell[2].contentId].id}/>
+                        {'navigator3'}
                     </Tape>
                     <Tape type={'cell'} size={cell[3].flexBasis}>
-                        <Navigator navigateTo={this.navigateTo4thCell} nodeId={content[cell[3].contentId].id}/>
+                        {'navigator4'}
                     </Tape>
                 </Tape>
 
@@ -617,6 +638,11 @@ class Layout extends Component {
         );
     }
 }
+
+// <Navigator navigateTo={this.navigateTo1stCell} nodeId={content[cell[0].contentId].id}/>
+// <Navigator navigateTo={this.navigateTo2ndCell} nodeId={content[cell[1].contentId].id}/>
+// <Navigator navigateTo={this.navigateTo3rdCell} nodeId={content[cell[2].contentId].id}/>
+// <Navigator navigateTo={this.navigateTo4thCell} nodeId={content[cell[3].contentId].id}/>
 
 Layout.propTypes = {
     layout: PropTypes.object,                   // need full version
