@@ -8,18 +8,21 @@ const initialState = {
 export default function navigatorReducer(state = initialState, {type, payload}) {
     switch (type) {
         case STORE_NODES: {
-            let root = [];
-            if (state.root !== undefined) {
-                root = state.root;
-            }
-            for (const nodeId in payload) {
-                if (nodeId['hier/parent'] === 0 && !root.includes(nodeId)) {
+            const {nodes, fetchRoot, downloadChildrenId} = payload;
+            let root = state.root;
+            if (fetchRoot) {
+                root = [];
+                for (const nodeId in payload) {
                     root.push(nodeId);
                 }
             }
+            const nodesMerged = Object.assign({}, state.nodes, nodes);
+            if (downloadChildrenId !== undefined) {
+                nodesMerged[downloadChildrenId].childrenDownloaded = true;
+            }
             return {
                 root,
-                nodes: Object.assign({}, state.nodes, payload)
+                nodes: nodesMerged
             };
         }
     }

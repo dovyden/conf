@@ -6,25 +6,20 @@ import './Layout.css';
 
 const b = b_.lock('layout');
 
-const Splitter = ({type, position, display}) => {
+const Splitter = ({type, splitter}) => {
     const stylePosition = {};
-    const pos = type === 'bottom' || type === 'top' ? 'top' : 'left';
+    const axis = (type === 'bottom' || type === 'top') ? 'top' : 'left';
 
-    stylePosition[pos] = `${position}%`;
+    stylePosition[axis] = `${splitter[0]}%`;
 
-    if (!(display.indexOf(type) + 1)) {     // -1 not found, but 0 found => + 1
-        return (
-            <div className={b('splitter', {[type]: true})} data-type={type} style={stylePosition}/>
-        );
-    } else {
-        return null;
-    }
+    return (splitter[2])            // hidden or not
+        ? (<div className={b('splitter', {[type]: true})} data-type={type} style={stylePosition}/>)
+        : null;
 };
 
 Splitter.propTypes = {
     type: PropTypes.string,
-    position: PropTypes.number,
-    display: PropTypes.string,
+    splitter: PropTypes.array,             // fill
 };
 
 export default Splitter;

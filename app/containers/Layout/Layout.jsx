@@ -2,10 +2,12 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
-import {changeLayout} from '../../actions/layout';
+import {changeLayout, navigateTo} from '../../actions/layout';
 import LayoutComponent from '../../components/Layout/Layout';
+import Navigator from '../Navigator/Navigator';
 import Tape from '../../components/Layout/Tape';
 import Splitter from '../../components/Layout/Splitter';
+import Box from '../../components/Layout/Box';
 
 function unFocus(document, window) {
     if (document.selection) {
@@ -25,43 +27,22 @@ class Layout extends Component {
 
         this.state = {
             currentState: state,
-            top: 0,                         // 4 splitters %
-            bottom: 100,
-            left: 0,
-            right: 100,
-            hiddenSplitters: '',            // display: none for splitters
-            contentId: [0, 1, 2, 3],        // for beginning doesn't matter
-            //
-            // position: {                     // splitter's position
-            //     top: 0,
-            //     bottom: 100,
-            //     left: 0,
-            //     right: 100,
-            // },
-            //
-            // size: {                         // splitter's size
-            //     top: 100,
-            //     bottom: 100,
-            //     left: 100,
-            //     right: 100,
-            // },
-            //
-            // visibility: {                   // splitter's visibility
-            //     top: true,
-            //     bottom: true,
-            //     left: true,
-            //     right: true,
-            // },
-            //
-            // dragging: {                     // splitter's visibility
-            //     top: false,
-            //     bottom: false,
-            //     left: false,
-            //     right: false,
-            // },
 
-            draggingSplitters: '',          // type of dragging
-            isDragging: false,              // state of dragging
+            draggingElement: '',
+            isDragging: false,
+            contentId: [0, 1, 2, 3],        // for beginning doesn't matter
+
+            // [X, Y, visibility, jointHorizontal, jointVertical]
+            box1st: [0, 0, true, 'top', 'left'],
+            box2nd: [0, 100, true, 'bottom', 'left'],
+            box3rd: [100, 0, true, 'top', 'right'],
+            box4th: [100, 100, true, 'bottom', 'right'],
+
+            top: [0, 100, true],            // [position, size, visibility]
+            bottom: [100, 100, true],
+            left: [0, 100, true],
+            right: [100, 100, true],
+
             parentWidth: 0,                 // of tape
             parentHeight: 0,                // depend on size of splitter
             offsetX: 0,
@@ -71,6 +52,11 @@ class Layout extends Component {
             sizeOfBox: 20,                  // for dragging intersection point
         };
         this.mouseDownLine = this.mouseDownLine.bind(this);
+
+        this.navigateTo1stCell = this.navigate.bind(this, 0);
+        this.navigateTo2ndCell = this.navigate.bind(this, 1);
+        this.navigateTo3rdCell = this.navigate.bind(this, 2);
+        this.navigateTo4thCell = this.navigate.bind(this, 3);
     }
 
     componentDidMount() {
@@ -86,416 +72,327 @@ class Layout extends Component {
         switch (e.target.dataset.type) {
             case 'top':
             case 'bottom':
+            case 'left':
+            case 'right':
                 this.downTo3(e, e.target.dataset.type);
                 break;
 
-            case 'left':
-            case 'right': {
-                const type1 = e.target.dataset.type;
-                const type2 = this.possibleDownTo2(e);
-                if (type2) {
-                    this.downTo2(e, `${type1} ${type2}`);
-                } else {
-                    this.downTo3(e, type1);
-                }
+            case 'box1st':                              // dragging box
+            case 'box2nd':
+            case 'box3rd':
+            case 'box4th':
+                this.downTo2(e, e.target.dataset.type);
                 break;
-            }
         }
     }
     down2(e) {
         switch (e.target.dataset.type) {
             case 'top':
-                this.downTo5();
-                break;
-
+            case 'left':
+            case 'right':
             case 'bottom':
                 this.downTo5();
                 break;
 
-            case 'left':
-            case 'right': {
-                const type1 = e.target.dataset.type;
-                const type2 = this.possibleDownTo2(e);
-                if (type2) {
-                    this.downTo2(e, `${type1} ${type2}`);
-                } else {
-                    this.downTo5();
-                }
+            case 'box1st':                              // dragging box
+            case 'box2nd':
+            case 'box3rd':
+            case 'box4th':
+                this.downTo2(e, e.target.dataset.type);
                 break;
-            }
         }
     }
     down3(e) {
-        if (e.target.dataset.type === this.state.draggingSplitters) {
-            this.downTo3(e, e.target.dataset.type);
-        } else {
-            this.downTo4();         // e.target.dataset.type: top, bottom, ...
-        }
-    }
-
-    down4() {
-        // if ('pos of splitter !== 0% or 100%') {
-        //     if ('type of splitter === left or right') {
-        //         this.possibleDownTo4();
-        //     } else {
-        //
-        //     }
-        //     if ('size of splitter !== 100%') {
-        //
-        //     }
-        //
-        // } else {
-        //     this.downTo4();         // e.target.dataset.type: top, bottom, ...
-        // }
-    }
-
-    possibleDownTo2(e) {
-        if (Math.abs(e.clientY - this.state.top
-                * e.target.parentElement.clientHeight / 100) < this.state.sizeOfBox) {
-            return 'top';
-        } else {
-            if (Math.abs(e.clientY - this.state.bottom
-                    * e.target.parentElement.clientHeight / 100) < this.state.sizeOfBox) {
-                return 'bottom';
-            }
-        }
-        return '';
-    }
-
-    // possibleDownTo4(e) {
-    //
-    // }
-
-    downTo2(e, types) {
-        let opposite;
-        switch (types) {
-            case 'left top':
-                opposite = 'right bottom';
-                break;
-            case 'right bottom':
-                opposite = 'left top';
-                break;
-            case 'left bottom':
-                opposite = 'right top';
-                break;
-            case 'right top':
-                opposite = 'left bottom';
-                break;
-        }
-
-        let contentId = [];
-        switch (this.state.currentState) {
-            case 1:             // ???
-                if (types === 'left top') {
-                    contentId = [
-                        this.state.contentId[3],
-                        this.state.contentId[1],
-                        this.state.contentId[2],
-                        this.state.contentId[0],
-                    ];
+        switch (e.target.dataset.type) {
+            case 'top':                         // dragging splitter
+            case 'bottom':
+            case 'left':
+            case 'right':
+                if (this.state[e.target.dataset.type][1] === 100) {         // [1] - size
+                    this.downTo3(e, e.target.dataset.type);
                 } else {
-                    if (types === 'right bottom') {
-                        contentId = [
-                            this.state.contentId[0],
-                            this.state.contentId[1],
-                            this.state.contentId[2],
-                            this.state.contentId[3],
-                        ];
-                    } else {
-                        if (types === 'left bottom') {
-                            contentId = [
-                                this.state.contentId[2],
-                                this.state.contentId[1],
-                                this.state.contentId[0],
-                                this.state.contentId[3],
-                            ];
-                        } else {
-                            contentId = [
-                                this.state.contentId[1],
-                                this.state.contentId[0],
-                                this.state.contentId[2],
-                                this.state.contentId[3],
-                            ];
-                        }
-                    }
+                    this.downTo4();
+                }
+                break;
+
+            case 'box1st':                      // dragging box
+            case 'box2nd':
+            case 'box3rd':
+            case 'box4th':
+                this.downTo4();
+                break;
+        }
+    }
+
+    // down4() {}
+    // down5() {}
+
+    downTo2(e, draggingElement) {               // исправить
+        const {contentId} = this.state;
+
+        const top = [...this.state.top];
+        const left = [...this.state.left];
+        const bottom = [...this.state.bottom];
+        const right = [...this.state.right];
+
+        const box1st = [...this.state.box1st];
+        const box2nd = [...this.state.box2nd];
+        const box3rd = [...this.state.box3rd];
+        const box4th = [...this.state.box4th];
+
+        let newContentId = [];
+        switch (this.state.currentState) {
+            case 1:
+                switch (draggingElement) {
+                    case 'box1st':
+                        newContentId = [contentId[3], contentId[1], contentId[2], contentId[0]];
+                        box2nd[2] = false; box3rd[2] = false; box4th[2] = false;    // hidden boxes
+                        bottom[2] = false; right[2] = false;                        // hidden splitters
+                        break;
+                    case 'box2nd':
+                        newContentId = [contentId[2], contentId[1], contentId[0], contentId[3]];
+                        box1st[2] = false; box3rd[2] = false; box4th[2] = false;    // hidden boxes
+                        top[2] = false; right[2] = false;                           // hidden splitters
+                        break;
+                    case 'box3rd':
+                        newContentId = [contentId[1], contentId[0], contentId[2], contentId[3]];
+                        box2nd[2] = false; box1st[2] = false; box4th[2] = false;    // hidden boxes
+                        bottom[2] = false; left[2] = false;                         // hidden splitters
+                        break;
+                    case 'box4th':
+                        newContentId = [contentId[0], contentId[1], contentId[2], contentId[3]];
+                        box2nd[2] = false; box3rd[2] = false; box1st[2] = false;    // hidden boxes
+                        top[2] = false; left[2] = false;                            // hidden splitters
+                        break;
                 }
                 break;
             case 2:
-                contentId = this.state.contentId;
+                newContentId = this.state.contentId;
                 break;
         }
-
-        const arr = types.split(' ');
 
         this.setState({
             ...this.state,
             currentState: 2,
-            draggingSplitters: types,
-            hiddenSplitters: opposite,
+            draggingElement,
             isDragging: true,
-            contentId,
+            contentId: newContentId,
+
+            top,
+            left,
+            bottom,
+            right,
+
+            box1st,
+            box2nd,
+            box3rd,
+            box4th,
 
             parentHeight: e.target.parentElement.clientHeight,
             parentWidth: e.target.parentElement.clientWidth,
-            offsetX: e.clientX - this.state[arr[0]]
-                * e.target.parentElement.clientWidth / 100,
-            offsetY: e.clientY - this.state[arr[1]]
-                * e.target.parentElement.clientHeight / 100,
+            offsetX: e.clientX - this.state[draggingElement][0] * e.target.parentElement.clientWidth / 100,  // [0]-X
+            offsetY: e.clientY - this.state[draggingElement][1] * e.target.parentElement.clientHeight / 100, // [1]-Y
         });
     }
-    downTo3(e, type) {
-        let opposite;
-        switch (type) {
-            case 'top':
-                opposite = 'bottom';
-                break;
-            case 'bottom':
-                opposite = 'top';
-                break;
-            case 'left':
-                opposite = 'right';
-                break;
-            case 'right':
-                opposite = 'left';
-                break;
-        }
+    downTo3(e, type) {                                  // draggingElement = type
+        const {contentId} = this.state;
 
-        let contentId = [];
+        const top = [...this.state.top];
+        const left = [...this.state.left];
+        const bottom = [...this.state.bottom];
+        const right = [...this.state.right];
+
+        const box1st = [...this.state.box1st];
+        const box2nd = [...this.state.box2nd];
+        const box3rd = [...this.state.box3rd];
+        const box4th = [...this.state.box4th];
+
+        box1st[2] = false; box2nd[2] = false; box3rd[2] = false; box4th[2] = false; // hidden boxes
+
+        let offset = [];
+        let newContentId = [];                          // for cells' content
         switch (this.state.currentState) {
             case 1:
-                contentId = (type === 'top' || type === 'left')
-                    ? [
-                        this.state.contentId[2],
-                        this.state.contentId[1],
-                        this.state.contentId[0],
-                        this.state.contentId[3],
-                    ]
-                    : [
-                        this.state.contentId[0],
-                        this.state.contentId[1],
-                        this.state.contentId[2],
-                        this.state.contentId[3],
-                    ];
+                newContentId = (type === 'top' || type === 'left')
+                    ? [contentId[2], contentId[1], contentId[0], contentId[3]]
+                    : [contentId[0], contentId[1], contentId[2], contentId[3]];
                 break;
             case 3:
-                contentId = this.state.contentId;
+                newContentId = this.state.contentId;
                 break;
         }
 
-        const arr = (type === 'left' || type === 'right')
-            ? [e.clientX - this.state[type] * e.target.parentElement.clientWidth / 100, 0]
-            : [0, e.clientY - this.state[type] * e.target.parentElement.clientHeight / 100];
+        switch (type) {
+            case 'top':
+                left[2] = false; bottom[2] = false; right[2] = false;   // hidden splitters
+                offset = [0, e.clientY - this.state[type][0] * e.target.parentElement.clientHeight / 100]; // Y
+                break;
+            case 'bottom':
+                left[2] = false; top[2] = false; right[2] = false;      // hidden splitters
+                offset = [0, e.clientY - this.state[type][0] * e.target.parentElement.clientHeight / 100]; // Y
+                break;
+            case 'left':
+                top[2] = false; bottom[2] = false; right[2] = false;    // hidden splitters
+                offset = [e.clientX - this.state[type][0] * e.target.parentElement.clientWidth / 100, 0];  // X
+                break;
+            case 'right':
+                left[2] = false; bottom[2] = false; top[2] = false;     // hidden splitters
+                offset = [e.clientX - this.state[type][0] * e.target.parentElement.clientWidth / 100, 0];  // X
+                break;
+        }
 
         this.setState({
             ...this.state,
             currentState: 3,
-            draggingSplitters: type,
-            hiddenSplitters: opposite,
+            draggingElement: type,
             isDragging: true,
-            contentId,
+            contentId: newContentId,
+
+            top,
+            left,
+            bottom,
+            right,
+
+            box1st,
+            box2nd,
+            box3rd,
+            box4th,
 
             parentHeight: e.target.parentElement.clientHeight,
             parentWidth: e.target.parentElement.clientWidth,
-            offsetX: arr[0],
-            offsetY: arr[1],
+            offsetX: offset[0],
+            offsetY: offset[1],
         });
     }
     downTo4() {}
     downTo5() {}
 
     move2(e) {
-        const arr = this.state.draggingSplitters.split(' ');
+        const coordinates = [
+            (e.clientX - this.state.offsetX) / this.state.parentWidth * 100,
+            (e.clientY - this.state.offsetY) / this.state.parentHeight * 100
+        ];
+
+        // check border
+
+        const box = [...this.state[this.state.draggingElement]];
+        box[0] = coordinates[0];     // [0]-X
+        box[1] = coordinates[1];     // [1]-Y
+
+        const horizontal = [...this.state[box[3]]];
+        const vertical = [...this.state[box[4]]];
+
+        horizontal[0] = box[1];
+        vertical[0] = box[0];
 
         this.setState({
             ...this.state,
-            [arr[0]]: (e.clientX - this.state.offsetX)
-                / this.state.parentWidth * 100,
-            [arr[1]]: (e.clientY - this.state.offsetY)
-                / this.state.parentHeight * 100,
+            [this.state.draggingElement]: box,              // dragging box
+            [box[3]]: horizontal,                           // horizontal
+            [box[4]]: vertical,                             // vertical
         });
     }
     move3(e) {
-        const position = (this.state.draggingSplitters === 'top' ||
-            this.state.draggingSplitters === 'bottom')
+        const coordinates = (this.state.draggingElement === 'top' || this.state.draggingElement === 'bottom')
             ? (e.clientY - this.state.offsetY) / this.state.parentHeight * 100
             : (e.clientX - this.state.offsetX) / this.state.parentWidth * 100;
 
+        // check border
+
+        const draggingElement = [...this.state[this.state.draggingElement]];
+        draggingElement[0] = coordinates;
+
         this.setState({
             ...this.state,
-            [this.state.draggingSplitters]: position,
+            [this.state.draggingElement]: draggingElement,
         });
     }
 
     up2(e) {
-        let contentId = this.possibleUpTo1(e, 2);
-        if (contentId !== false) {
-            this.upTo1(contentId);
-        } else {
-            const arr = this.state.draggingSplitters.split(' ');
-            contentId = this.possibleUpTo2(e, 2);
-            if (contentId !== false) {
-                this.upTo2(this.state.draggingSplitters,
-                    this.state[arr[0]] + this.state.offsetX
-                        / this.state.parentWidth * 100,
-                    this.state[arr[1]] + this.state.offsetY
-                        / this.state.parentHeight * 100, contentId);
-            } else {
-                if (e.clientY < this.state.minSizeOfCell) {
-                    this.upTo3(arr[0], (e.clientX - this.state.offsetX)
-                        / this.state.parentWidth * 100, [
-                        this.state.contentId[1],
-                        this.state.contentId[0],
-                        this.state.contentId[3],
-                        this.state.contentId[2],
-                    ]);
-                } else {
-                    if (e.clientY > this.state.parentHeight - this.state.minSizeOfCell) {
-                        this.upTo3(arr[0], (e.clientX - this.state.offsetX)
-                            / this.state.parentWidth * 100, [
-                            this.state.contentId[0],
-                            this.state.contentId[1],
-                            this.state.contentId[2],
-                            this.state.contentId[3],
-                        ]);
-                    } else {
-                        if (e.clientX < this.state.minSizeOfCell) {
-                            this.upTo3(arr[1], (e.clientY - this.state.offsetY)
-                                / this.state.parentHeight * 100, [
-                                this.state.contentId[2],
-                                this.state.contentId[1],
-                                this.state.contentId[3],
-                                this.state.contentId[0],
-                            ]);
-                        } else {
-                            this.upTo3(arr[1], (e.clientY - this.state.offsetY)
-                                / this.state.parentHeight * 100, [
-                                this.state.contentId[0],
-                                this.state.contentId[2],
-                                this.state.contentId[1],
-                                this.state.contentId[3],
-                            ]);
-                        }
-                    }
-                }
+        const {contentId} = this.state;
+        // border
+        const top = (e.clientY < this.state.minSizeOfCell);
+        const bottom = (e.clientY > this.state.parentHeight - this.state.minSizeOfCell);
+        const left = (e.clientX < this.state.minSizeOfCell);
+        const right = (e.clientX > this.state.parentWidth - this.state.minSizeOfCell);
+
+        // only 3 states
+        if (top) {
+            if (left) {
+                return this.upTo1([contentId[3], contentId[1], contentId[2], contentId[0]]);
             }
+            if (right) {
+                return this.upTo1([contentId[1], contentId[0], contentId[2], contentId[3]]);
+            }
+            return this.upTo3(this.state[this.state.draggingElement][4],
+                [contentId[1], contentId[0], contentId[3], contentId[2]]);
         }
+        if (bottom) {
+            if (left) {
+                return this.upTo1([contentId[2], contentId[1], contentId[0], contentId[3]]);
+            }
+            if (right) {
+                return this.upTo1([contentId[0], contentId[1], contentId[2], contentId[3]]);
+            }
+            return this.upTo3(this.state[this.state.draggingElement][4],
+                [contentId[0], contentId[1], contentId[2], contentId[3]]);
+        }
+        if (left) {
+            return this.upTo3(this.state[this.state.draggingElement][3],
+                [contentId[2], contentId[1], contentId[3], contentId[0]]);
+        }
+        if (right) {
+            return this.upTo3(this.state[this.state.draggingElement][3],
+                [contentId[0], contentId[2], contentId[1], contentId[3]]);
+        }
+        return this.upTo2(this.state.contentId);
     }
     up3(e) {
-        const contentId = this.possibleUpTo1(e, 3);
-        if (contentId !== false) {
-            this.upTo1(contentId);
-        } else {
-            const pos = (this.state.draggingSplitters === 'top' ||
-                this.state.draggingSplitters === 'bottom')
-                ? e.clientY / this.state.parentHeight * 100
-                : e.clientX / this.state.parentWidth * 100;
-
-            this.upTo3(this.state.draggingSplitters, pos, this.state.contentId);
-        }
-    }
-
-    possibleUpTo1(e, previousState) {
+        const {contentId} = this.state;
+        // border
         const top = (e.clientY < this.state.minSizeOfCell);
-        const bottom = (e.clientY > this.state.parentHeight
-            - this.state.minSizeOfCell);
+        const bottom = (e.clientY > this.state.parentHeight - this.state.minSizeOfCell);
         const left = (e.clientX < this.state.minSizeOfCell);
-        const right = (e.clientX > this.state.parentWidth
-            - this.state.minSizeOfCell);
+        const right = (e.clientX > this.state.parentWidth - this.state.minSizeOfCell);
 
-        switch (previousState) {                // ???
-            case 2:
-                if (top && left) {
-                    return [
-                        this.state.contentId[3],
-                        this.state.contentId[1],
-                        this.state.contentId[2],
-                        this.state.contentId[0]
-                    ];
-                } else {
-                    if (top && right) {
-                        return [
-                            this.state.contentId[1],
-                            this.state.contentId[0],
-                            this.state.contentId[2],
-                            this.state.contentId[3]
-                        ];
-                    } else {
-                        if (bottom && left) {
-                            return [
-                                this.state.contentId[2],
-                                this.state.contentId[1],
-                                this.state.contentId[0],
-                                this.state.contentId[3]
-                            ];
-                        } else {
-                            if (bottom && right) {
-                                return [
-                                    this.state.contentId[0],
-                                    this.state.contentId[1],
-                                    this.state.contentId[2],
-                                    this.state.contentId[3]
-                                ];
-                            } else {
-                                return false;
-                            }
-                        }
-                    }
-                }
-            case 3:
-                if (top || left) {
-                    return [
-                        this.state.contentId[2],
-                        this.state.contentId[1],
-                        this.state.contentId[0],
-                        this.state.contentId[3]
-                    ];
-                } else {
-                    if (bottom || right) {
-                        return [
-                            this.state.contentId[0],
-                            this.state.contentId[1],
-                            this.state.contentId[2],
-                            this.state.contentId[3]
-                        ];
-                    } else {
-                        return false;
-                    }
-                }
-            // case 4:
-            // case 5:              all must return id or  false;
+        if (this.state.draggingElement === 'top' || this.state.draggingElement === 'bottom') {
+            if (top) {
+                return this.upTo1([contentId[2], contentId[1], contentId[0], contentId[3]]);
+            }
+            if (bottom) {
+                return this.upTo1([contentId[0], contentId[1], contentId[2], contentId[3]]);
+            }
+        } else {
+            if (left) {
+                return this.upTo1([contentId[2], contentId[1], contentId[0], contentId[3]]);
+            }
+            if (right) {
+                return this.upTo1([contentId[0], contentId[1], contentId[2], contentId[3]]);
+            }
         }
 
-    }
-    possibleUpTo2(e, previousState) {
-        switch (previousState) {
-            case 2:
-                if (e.clientY > this.state.minSizeOfCell &&
-                    e.clientX > this.state.minSizeOfCell &&
-                    e.clientY < this.state.parentHeight
-                        - this.state.minSizeOfCell &&
-                    e.clientX < this.state.parentWidth
-                        - this.state.minSizeOfCell) {
-                    return this.state.contentId;
-                } else {
-                    return false;
-                }
-            // case 4:
-            // case 5:              all must return [] or -1;
-        }
+        return this.upTo3(this.state.draggingElement, this.state.contentId);
     }
 
     upTo1(contentId) {
-        this.setState({
+
+        this.setState({                     // default state (exception: contentId)
             ...this.state,
             currentState: 1,
+
+            draggingElement: '',
             isDragging: false,
-            draggingSplitters: '',
-            top: 0,
-            bottom: 100,
-            left: 0,
-            right: 100,
-            hiddenSplitters: '',
             contentId,
+
+            box1st: [0, 0, true, 'top', 'left'],
+            box2nd: [0, 100, true, 'bottom', 'left'],
+            box3rd: [100, 0, true, 'top', 'right'],
+            box4th: [100, 100, true, 'bottom', 'right'],
+
+            top: [0, 100, true],
+            bottom: [100, 100, true],
+            left: [0, 100, true],
+            right: [100, 100, true],
         });
 
         const {changeLayout} = this.props;
@@ -505,32 +402,17 @@ class Layout extends Component {
             tape: 100,
             cellOf1stTape: 100,
             cellOf2ndTape: 0,
-            contentId: [...contentId],
+            contentId,
         });
     }
-    upTo2(types, size, sizeOfCell, contentId) {
-        let opposite;
-        switch (types) {
-            case 'left top':
-                opposite = 'right bottom';
-                break;
-            case 'right bottom':
-                opposite = 'left top';
-                break;
-            case 'left bottom':
-                opposite = 'right top';
-                break;
-            case 'right top':
-                opposite = 'left bottom';
-                break;
-        }
-
+    upTo2(contentId) {
+        const box = [...this.state[this.state.draggingElement]];
         this.setState({
             ...this.state,
             currentState: 2,
+
+            draggingElement: '',
             isDragging: false,
-            draggingSplitters: types,
-            hiddenSplitters: opposite,
             contentId,
         });
 
@@ -538,47 +420,85 @@ class Layout extends Component {
         changeLayout({
             stateId: 2,
             direction: 'row',
-            tape: size,
-            cellOf1stTape: sizeOfCell,
-            cellOf2ndTape: sizeOfCell,
+            tape: box[0],
+            cellOf1stTape: box[1],
+            cellOf2ndTape: box[1],
             contentId,
         });
     }
-    upTo3(type, size, contentId) {
-        const direction = (type === 'top' || type === 'bottom') ? 'column' : 'row';
+    upTo3(draggingElement, contentId) {
+        const top = [...this.state.top];
+        const left = [...this.state.left];
+        const bottom = [...this.state.bottom];
+        const right = [...this.state.right];
 
-        let opposite;
-        switch (type) {
+        const box1st = [...this.state.box1st];
+        const box2nd = [...this.state.box2nd];
+        const box3rd = [...this.state.box3rd];
+        const box4th = [...this.state.box4th];
+
+        let direction;
+        switch (draggingElement) {
             case 'top':
-                opposite = 'bottom';
+                bottom[2] = false; left[2] = true; right[2] = true;
+                box2nd[2] = false; box4th[2] = false; box1st[2] = true; box3rd[2] = true;
+
+                bottom[0] = 100; left[0] = 0; right[0] = 100;
+                box1st[1] = top[0]; box1st[0] = 0;
+                box3rd[1] = top[0]; box3rd[0] = 100;
+
+                direction = 'column';
                 break;
             case 'bottom':
-                opposite = 'top';
+                top[2] = false; left[2] = true; right[2] = true;
+                box1st[2] = false; box3rd[2] = false; box2nd[2] = true; box4th[2] = true;
+
+                top[0] = 0; left[0] = 0; right[0] = 100;
+                box2nd[1] = bottom[0]; box2nd[0] = 0;
+                box4th[1] = bottom[0]; box4th[0] = 100;
+
+                direction = 'column';
                 break;
             case 'left':
-                opposite = 'right';
+                right[2] = false; top[2] = true; bottom[2] = true;
+                box3rd[2] = false; box4th[2] = false; box1st[2] = true; box2nd[2] = true;
+
+                top[0] = 0; bottom[0] = 100; right[0] = 100;
+                box1st[1] = 0; box1st[0] = left[0];
+                box2nd[1] = 100; box2nd[0] = left[0];
+
+                direction = 'row';
                 break;
             case 'right':
-                opposite = 'left';
+                left[2] = false; top[2] = true; bottom[2] = true;
+                box1st[2] = false; box2nd[2] = false; box3rd[2] = true; box4th[2] = true;
+
+                top[0] = 0; bottom[0] = 100; left[0] = 0;
+                box3rd[1] = 0; box3rd[0] = right[0];
+                box4th[1] = 100; box4th[0] = right[0];
+
+                direction = 'row';
                 break;
         }
 
-        const splitters = {
-            top: 0,
-            bottom: 100,
-            left: 0,
-            right: 100,
-        };
-        delete splitters[type];
-
+        const size = this.state[draggingElement][0];
         this.setState({
             ...this.state,
             currentState: 3,
+
+            draggingElement: '',
             isDragging: false,
-            draggingSplitters: type,
-            ...splitters,
-            hiddenSplitters: opposite,
             contentId,
+
+            top,
+            left,
+            bottom,
+            right,
+
+            box1st,
+            box2nd,
+            box3rd,
+            box4th,
         });
 
         const {changeLayout} = this.props;
@@ -604,9 +524,9 @@ class Layout extends Component {
                 case 3:
                     this.down3(e);
                     break;
-                case 4:
-                    this.down4(e);
-                    break;
+                // case 4:
+                //     this.down4(e);
+                //     break;
                 // case 5:
                 //     this.down5(e);
                 //     break;
@@ -651,77 +571,68 @@ class Layout extends Component {
         }
     }
 
+    navigate(id, {type, contentId}) {
+        const {navigateTo} = this.props;
+
+        const {cell} = this.props.layout;
+        const cellId = cell[id].contentId;
+
+        navigateTo({type, cellId, contentId});
+    }
+
     render() {
         const {
             top,
             bottom,
             left,
             right,
-            hiddenSplitters,
+
+            box1st,
+            box2nd,
+            box3rd,
+            box4th,
         } = this.state;
 
         const {
             tape,
             cell,
-            content,
+            content
         } = this.props.layout;
 
         const {direction} = this.props.layout.root;
+        const cellDirection = (direction === 'row') ? 'column' : 'row';
 
         return (
-            <LayoutComponent
-                direction={direction}
-                mousedown={this.mouseDownLine}
-            >
-                <Splitter
-                    type={'top'}
-                    position={top}
-                    display = {hiddenSplitters}
-                />
-                <Splitter
-                    type={'bottom'}
-                    position={bottom}
-                    display = {hiddenSplitters}
-                />
-                <Splitter
-                    type={'left'}
-                    position={left}
-                    display = {hiddenSplitters}
-                />
-                <Splitter
-                    type={'right'}
-                    position={right}
-                    display = {hiddenSplitters}
-                />
-                <Tape
-                    type={'tape'}
-                    direction={(direction === 'row') ? 'column' : 'row'}
-                    size={tape[0]}
-                >
-                    <Tape
-                        type={'cell'}
-                        size={cell[0].flexBasis}
-                    >{content[cell[0].contentId].id}</Tape>
-                    <Tape
-                        type={'cell'}
-                        size={cell[1].flexBasis}
-                    >{content[cell[1].contentId].id}</Tape>
+            <LayoutComponent direction={direction} mousedown={this.mouseDownLine}>
+
+                <Splitter type={'top'} splitter={top}/>
+                <Splitter type={'bottom'} splitter={bottom}/>
+                <Splitter type={'left'} splitter={left}/>
+                <Splitter type={'right'} splitter={right}/>
+
+                <Box type={'box1st'} box={box1st}/>
+                <Box type={'box2nd'} box={box2nd}/>
+                <Box type={'box3rd'} box={box3rd}/>
+                <Box type={'box4th'} box={box4th}/>
+
+                <Tape type={'tape'} direction={cellDirection} size={tape[0]}>
+                    <Tape type={'cell'} size={cell[0].flexBasis}>
+                        <Navigator navigateTo={this.navigateTo1stCell} nodeId={content[cell[0].contentId].id}/>
+                    </Tape>
+                    <Tape type={'cell'} size={cell[1].flexBasis}>
+                        <Navigator navigateTo={this.navigateTo2ndCell} nodeId={content[cell[1].contentId].id}/>
+                    </Tape>
                 </Tape>
 
-                <Tape
-                    type={'tape'}
-                    direction={(direction === 'row') ? 'column' : 'row'}
-                    size={tape[1]}
-                >
-                    <Tape
-                        type={'cell'}
-                        size={cell[2].flexBasis}
-                    >{content[cell[2].contentId].id}</Tape>
-                    <Tape
-                        type={'cell'}
-                        size={cell[3].flexBasis}
-                    >{content[cell[3].contentId].id}</Tape>
+                <Tape type={'tape'} direction={cellDirection} size={tape[1]}>
+                    <Tape type={'cell'} size={cell[2].flexBasis}>
+                        <Navigator navigateTo={this.navigateTo3rdCell} nodeId={content[cell[2].contentId].id}/>
+                    </Tape>
+                    <Tape type={'cell'} size={cell[3].flexBasis}>
+                        <Navigator navigateTo={this.navigateTo4thCell} nodeId={content[cell[3].contentId].id}/>
+                    </Tape>
                 </Tape>
+
             </LayoutComponent>
         );
     }
@@ -730,6 +641,7 @@ class Layout extends Component {
 Layout.propTypes = {
     layout: PropTypes.object,                   // need full version
     changeLayout: PropTypes.func,
+    navigateTo: PropTypes.func,
 };
 
 function mapStateToProps(state) {
@@ -740,7 +652,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        changeLayout: (props) => dispatch(changeLayout(props))
+        changeLayout: (props) => dispatch(changeLayout(props)),
+        navigateTo: (props) => dispatch(navigateTo(props)),
     };
 }
 

@@ -1,4 +1,7 @@
-import {LAYOUT_CHANGE} from '../constants/layout';
+import {
+    LAYOUT_CHANGE,
+    NAVIGATE_TO,
+} from '../constants/layout';
 
 const initState = {
     root: {
@@ -24,16 +27,16 @@ const initState = {
     content: [
         {
             type: 'navigator',
-            id: '1st',
+            id: '',
         }, {
             type: 'navigator',
-            id: '2nd',
+            id: '',
         }, {
             type: 'navigator',
-            id: '3rd',
+            id: '',
         }, {
             type: 'navigator',
-            id: '4th',
+            id: '',
         }
     ],
 };
@@ -74,6 +77,25 @@ export default function layout(state = initState, {type, payload}) {
                 ]
             };
         }
+
+        case NAVIGATE_TO: {
+            const {
+                type,
+                cellId,
+                contentId
+            } = payload;
+
+            return {
+                ...state,
+                content: {...state.content,
+                    [cellId]: {
+                        type,
+                        id: contentId,
+                    }
+                },
+            };
+        }
+
         default:
             return state;
     }

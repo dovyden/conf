@@ -1,0 +1,36 @@
+.nodes-list {
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: collapse;
+    height: calc(100% - 70px);
+}
+
+.nodes-list__nodes {
+    display: block;
+    height: 100%;
+    overflow: auto;
+}
+
+.nodes-list__node-attrs-names {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: space-around;
+    background-color: rgba(193, 193, 193, 0.21);
+}
+
+.nodes-list__text {
+    width: 30%;
+    height: 17px;
+    text-align: left;
+    margin-left: 10px;
+}
+
+.nodes-list__text_node-attrs-names {
+    color: #8d919a;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 0.2px;
+}
