@@ -2,9 +2,8 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
-import {changeLayout, navigateTo} from '../../actions/layout';
+import {changeLayout} from '../../actions/layout';
 import LayoutComponent from '../../components/Layout/Layout';
-import Navigator from '../Navigator/Navigator';
 import Tape from '../../components/Layout/Tape';
 import Splitter from '../../components/Layout/Splitter';
 import Box from '../../components/Layout/Box';
@@ -52,12 +51,6 @@ class Layout extends Component {
             sizeOfBox: 20,                  // for dragging intersection point
         };
         this.mouseDownLine = this.mouseDownLine.bind(this);
-
-        // Navigate func binding
-        this.navigateTo1stCell = this.navigate.bind(this, 0);
-        this.navigateTo2ndCell = this.navigate.bind(this, 1);
-        this.navigateTo3rdCell = this.navigate.bind(this, 2);
-        this.navigateTo4thCell = this.navigate.bind(this, 3);
     }
 
     componentDidMount() {
@@ -140,15 +133,15 @@ class Layout extends Component {
                         newContentId = [contentId[3], contentId[1], contentId[2], contentId[0]];
                         break;
                     case 'box2nd':
-                        newContentId = [contentId[2], contentId[1], contentId[0], contentId[3]];
+                        newContentId = [contentId[0], contentId[1], contentId[2], contentId[3]];
                         box1st[0] = box2nd[0]; box1st[1] = box2nd[1];
                         break;
                     case 'box3rd':
-                        newContentId = [contentId[1], contentId[0], contentId[2], contentId[3]];
+                        newContentId = [contentId[2], contentId[1], contentId[0], contentId[3]];
                         box1st[0] = box3rd[0]; box1st[1] = box3rd[1];
                         break;
                     case 'box4th':
-                        newContentId = [contentId[0], contentId[1], contentId[2], contentId[3]];
+                        newContentId = [contentId[1], contentId[0], contentId[2], contentId[3]];
                         box1st[0] = box4th[0]; box1st[1] = box4th[1];
                         break;
                 }
@@ -552,15 +545,6 @@ class Layout extends Component {
         }
     }
 
-    navigate(id, {type, contentId}) {
-        const {navigateTo} = this.props;
-
-        const {cell} = this.props.layout;
-        const cellId = cell[id].contentId;
-
-        navigateTo({type, cellId, contentId});
-    }
-
     render() {
         const {
             top,
@@ -576,7 +560,7 @@ class Layout extends Component {
         const {
             tape,
             cell,
-            content
+            content,
         } = this.props.layout;
 
         const {direction} = this.props.layout.root;
@@ -597,19 +581,19 @@ class Layout extends Component {
 
                 <Tape type={'tape'} direction={cellDirection} size={tape[0]}>
                     <Tape type={'cell'} size={cell[0].flexBasis}>
-                        <Navigator navigateTo={this.navigateTo1stCell} nodeId={content[cell[0].contentId].id}/>
+                        {content[cell[0].contentId].id}
                     </Tape>
                     <Tape type={'cell'} size={cell[1].flexBasis}>
-                        <Navigator navigateTo={this.navigateTo2ndCell} nodeId={content[cell[1].contentId].id}/>
+                        {content[cell[1].contentId].id}
                     </Tape>
                 </Tape>
 
                 <Tape type={'tape'} direction={cellDirection} size={tape[1]}>
                     <Tape type={'cell'} size={cell[2].flexBasis}>
-                        <Navigator navigateTo={this.navigateTo3rdCell} nodeId={content[cell[2].contentId].id}/>
+                        {content[cell[2].contentId].id}
                     </Tape>
                     <Tape type={'cell'} size={cell[3].flexBasis}>
-                        <Navigator navigateTo={this.navigateTo4thCell} nodeId={content[cell[3].contentId].id}/>
+                        {content[cell[3].contentId].id}
                     </Tape>
                 </Tape>
 
@@ -621,7 +605,6 @@ class Layout extends Component {
 Layout.propTypes = {
     layout: PropTypes.object,                   // need full version
     changeLayout: PropTypes.func,
-    navigateTo: PropTypes.func,
 };
 
 function mapStateToProps(state) {
@@ -632,8 +615,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        changeLayout: (props) => dispatch(changeLayout(props)),
-        navigateTo: (props) => dispatch(navigateTo(props)),
+        changeLayout: (props) => dispatch(changeLayout(props))
     };
 }
 
