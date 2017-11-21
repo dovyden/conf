@@ -6,7 +6,7 @@ import './Layout.css';
 
 const b = b_.lock('layout');
 
-const Tape = ({children, direction, size, type}) => {
+const Tape = ({children, type, direction, size}) => {
     const styleProp = {
         flexBasis: `${size}%`,
     };
@@ -20,9 +20,9 @@ const Tape = ({children, direction, size, type}) => {
 
 Tape.propTypes = {
     children: PropTypes.node,
+    type: PropTypes.string,
     direction: PropTypes.string,
     size: PropTypes.number,
-    type: PropTypes.string,
 };
 
 export default Tape;
